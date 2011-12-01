@@ -1,8 +1,7 @@
 -module(espec).
+
 -export([
-        run/1,
-        a_test/0,
-        spec/0
+        run/1
     ]).
 
 run(Mods) when is_list(Mods) ->
@@ -122,33 +121,3 @@ run_after(Fun) ->
 
 indentation(Depth) ->
     lists:duplicate(Depth * 2, " ").
-
-a_test() ->
-    io:format(user, "Running!~n", []),
-    espec:run([espec]).
-
-% hrl
--define(_describe(Description, Body), {group, ?LINE, Description, Body}).
--define(_before(Type, Fun), {before, ?LINE, Fun}).
--define(_it(Description), {pending, ?LINE, Description}).
--define(_it(Description, Fun), {example, ?LINE, Description, Fun}).
-
-% example
-spec() ->
-    [
-        ?_describe("square", [
-                ?_before(each, fun() ->
-                            ok
-                    end),
-
-                ?_it("should have four sides"),
-
-                ?_it("should have sides of the same length"),
-
-                ?_it("should do stuff", fun() ->
-                            A = 1,
-                            B = 2,
-                            A = 2
-                    end)
-            ])
-    ].
