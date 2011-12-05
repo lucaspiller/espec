@@ -30,10 +30,10 @@ walk_spec_statement({call, LineNo, {atom, _LineNo2, it}, [{string, _LineNo3, Des
   erl_syntax:tuple([erl_syntax:atom(example), erl_syntax:integer(LineNo), erl_syntax:string(Description), Fun]);
 
 walk_spec_statement({call, LineNo, {atom, _LineNo2, before_each}, [{'fun', _LineNo4, _Clauses} = Fun]}) ->
-  erl_syntax:tuple([erl_syntax:atom(before), erl_syntax:integer(LineNo), erl_syntax:atom(each), Fun]);
+  erl_syntax:tuple([erl_syntax:atom(before_), erl_syntax:integer(LineNo), erl_syntax:atom(each), Fun]);
 
 walk_spec_statement({call, LineNo, {atom, _LineNo2, before_all}, [{'fun', _LineNo4, _Clauses} = Fun]}) ->
-  erl_syntax:tuple([erl_syntax:atom(before), erl_syntax:integer(LineNo), erl_syntax:atom(all), Fun]);
+  erl_syntax:tuple([erl_syntax:atom(before_), erl_syntax:integer(LineNo), erl_syntax:atom(all), Fun]);
 
 walk_spec_statement({call, LineNo, {atom, _LineNo2, after_each}, [{'fun', _LineNo4, _Clauses} = Fun]}) ->
   erl_syntax:tuple([erl_syntax:atom(after_), erl_syntax:integer(LineNo), erl_syntax:atom(each), Fun]);

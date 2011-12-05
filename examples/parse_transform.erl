@@ -9,6 +9,10 @@ myfun() ->
 
 spec() ->
   describe("beforespec", fun() ->
+        before_all(fun() ->
+              io:format("before all~n", [])
+        end),
+
         before_each(fun() ->
               io:format("before each~n", [])
         end),
@@ -25,5 +29,9 @@ spec() ->
 
         after_each(fun() ->
               io:format("after each~n", [])
+        end),
+
+        after_all(fun() ->
+              io:format("after all~n", [])
         end)
   end).
