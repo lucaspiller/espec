@@ -1,19 +1,30 @@
 -module(espec).
 
 -export([
-        run/1
+        run/1,
+        run/2,
+        filter_groups_by_line/2
     ]).
 
 run(Mods) when is_list(Mods) ->
     lists:foreach(fun(Mod) ->
                 run(Mod)
         end, Mods);
+
 run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
+    run_spec(Spec).
+
+run(Mod, LineNo) ->
+    Spec = filter_groups_by_line(LineNo, Mod:spec()),
+    run_spec(Spec).
+
+run_spec(Spec) ->
     lists:foreach(fun({Description, Children}) ->
         run_group(0, Description, [], [], Children)
     end, extract_groups(Spec)).
 
+   
 run_group(Indentation, GroupDescription, Befores, Afters, Children) ->
     io:format(user, "~s~s\n", [indentation(Indentation), GroupDescription]),
     BeforeEach = Befores ++ extract_before_each(Children),
@@ -116,3 +127,37 @@ run_functions(Error, Funs) ->
 
 indentation(Depth) ->
     lists:duplicate(Depth * 2, " ").
+
+is_setup(Part) ->
+    Specifier = element(1, Part),
+    Specifier =:= before_ orelse Specifier =:= after_.
+
+filter_groups_by_line(Line, Groups) ->
+    filter_by_line(Line, 999999999999999999999, Groups).
+
+filter_element_by_line(Line, EndLine, {group, StartLine, Description, Body}) ->
+    {group, StartLine, Description, filter_by_line(Line, EndLine, Body)};
+
+filter_element_by_line(_Line, _EndLine, Part) ->
+    Part.
+
+filter_by_line(_Line, _EndLine, []) ->
+    [];
+
+filter_by_line(Line, EndLine, Body) ->
+    PartsWithEndLines = lists:zip(Body, [ element(2, Part) || Part <- tl(Body) ] ++ [EndLine]),
+    HasMatchingPart = lists:any(
+        fun({Part, PartEndLine}) -> 
+            not is_setup(Part) andalso element(2, Part) =< Line andalso PartEndLine > Line
+        end, PartsWithEndLines),
+    case HasMatchingPart of
+        true ->
+            FilteredParts = lists:filter(fun({Part, PartEndLine}) ->
+                is_setup(Part) orelse (element(2, Part) =< Line andalso PartEndLine > Line)
+            end, PartsWithEndLines),
+            lists:map(fun({Part, PartEndLine}) ->
+                filter_element_by_line(Line, PartEndLine, Part)
+            end, FilteredParts);
+        false ->
+            lists:map(fun({Part, _EndLine}) -> Part end, PartsWithEndLines)
+     end.
