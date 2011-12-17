@@ -24,7 +24,8 @@ end_example(Description, Result, #state{indentation = Indentation} = State) ->
 
   State.
 
-pending_example(_Description, State) ->
+pending_example(Description, #state{indentation = Indentation} = State) ->
+  io:format(user, "~s~s~s (PENDING)~s\n", [pending_color(State), indentation(Indentation + 1), Description, no_color(State)]),
   State.
 
 start_group(GroupDescription, #state{indentation = Indentation} = State) ->
@@ -43,6 +44,11 @@ success_color(#state{color = false}) ->
 success_color(_) ->
   green().
 
+pending_color(#state{color = false}) ->
+  "";
+pending_color(_) ->
+  yellow().
+
 failure_color(#state{color = false}) ->
   "";
 
@@ -60,3 +66,5 @@ green() ->
 red() ->
   "\e[0;31m".
 
+yellow() ->
+  "\e[0;33m".
