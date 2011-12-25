@@ -1,6 +1,41 @@
 -module(espec_transform).
-
 -export([parse_transform/2]).
+
+%
+% This parse transform converts a spec file into a tree respresentation. For
+% example, we go from:
+%
+%  describe("after_all spec", fun() ->
+%        after_all(fun() ->
+%              append(ran_after_all, after_all3)
+%          end),
+%
+%        it("should do stuff", fun() ->
+%              append(example, after_all3)
+%          end),
+%
+%        describe("nestedspec", fun() ->
+%              after_all(fun() ->
+%                    append(ran_after_all_nested, after_all3)
+%                end),
+%
+%              it("should do nested stuff", fun() ->
+%                    append(nested_example, after_all3)
+%                end)
+%          end)
+%    end).
+%
+% To:
+%
+%   [{group,254,"after_all spec",
+%       [{after_,255,all,#Fun<before_after_filter_spec.44.53736782>},
+%         {example,259,"should do stuff",
+%           #Fun<before_after_filter_spec.45.19509813>},
+%         {group,263,"nestedspec",
+%           [{after_,264,all,#Fun<before_after_filter_spec.46.81668172>},
+%             {example,268,"should do nested stuff",
+%               #Fun<before_after_filter_spec.47.50609279>}]}]}]
+%
 
 parse_transform(AST, _Options) ->
   walk_head(AST).
