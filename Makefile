@@ -9,8 +9,8 @@ compile: deps
 dev: compile
 	erl -pa deps/*/ebin -pa ebin -s inets start -s reloader start
 
-test: compile
-	erl -pa deps/*/ebin -pa ebin -noshell -s espec run_no_shell espec_espec
+spec: compile
+	./bin/espec spec
 
 clean:
 	./rebar clean
