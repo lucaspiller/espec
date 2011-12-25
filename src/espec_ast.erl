@@ -16,9 +16,13 @@ convert_to_execution_tree([], _, Parsed) ->
   lists:flatten(Parsed);
 convert_to_execution_tree([{group, Line, Description, Body} | AST], Filters, Parsed) ->
   BodyExecutionTree = convert_to_execution_tree(Body, []),
+  BeforeInstruction = proplists:get_value(before_each, Filters, []),
+  AfterInstruction = proplists:get_value(after_each, Filters, []),
   InstructionTree = [
     {end_group, Line, Description},
+    AfterInstruction,
     BodyExecutionTree,
+    BeforeInstruction,
     {start_group, Line, Description}
   ],
   convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed]);
