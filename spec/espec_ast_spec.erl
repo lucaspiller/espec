@@ -142,12 +142,12 @@ spec() ->
                     [
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
-                      {run, Filter},
+                      {run, Fun1},
                       {end_example, 2, "example1"},
                       {start_example, 3, "example2"},
-                      {run, Filter},
-                      {end_example, 3, "example2"},
                       {run, Fun2},
+                      {end_example, 3, "example2"},
+                      {run, Filter},
                       {end_group, 1, "example spec"}
                     ] = espec_ast:convert_to_execution_tree(AST)
                 end)
