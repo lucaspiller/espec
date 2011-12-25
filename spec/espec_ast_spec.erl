@@ -7,8 +7,8 @@ spec() ->
               Fun = fun() -> ok end,
               AST = [
                 {group, 1, "example spec", [
-                  {example, 2, "example1", Fun}
-                ]}
+                    {example, 2, "example1", Fun}
+                  ]}
               ],
               [
                 {start_group, 1, "example spec"},
@@ -17,29 +17,29 @@ spec() ->
                 {end_example, 2, "example1"},
                 {end_group, 1, "example spec"}
               ] = espec_ast:convert_to_execution_tree(AST)
-        end),
+          end),
 
         it("should return pending example in execution tree format", fun() ->
               AST = [
                 {group, 1, "example spec", [
-                  {pending, 2, "example1"}
-                ]}
+                    {pending, 2, "example1"}
+                  ]}
               ],
               [
                 {start_group, 1, "example spec"},
                 {pending_example, 2, "example1"},
                 {end_group, 1, "example spec"}
               ] = espec_ast:convert_to_execution_tree(AST)
-        end),
+          end),
 
         it("should return multiple examples in execution tree format", fun() ->
               Fun1 = fun() -> ok end,
               Fun2 = fun() -> ok end,
               AST = [
                 {group, 1, "example spec", [
-                  {example, 2, "example1", Fun1},
-                  {example, 3, "example2", Fun2}
-                ]}
+                    {example, 2, "example1", Fun1},
+                    {example, 3, "example2", Fun2}
+                  ]}
               ],
               [
                 {start_group, 1, "example spec"},
@@ -51,20 +51,105 @@ spec() ->
                 {end_example, 3, "example2"},
                 {end_group, 1, "example spec"}
               ] = espec_ast:convert_to_execution_tree(AST)
-        end),
+          end),
 
-      describe("filters", fun() ->
-            it("should return before each filters in execution tree format"),
-            it("should return after each filters in execution tree format"),
-            it("should return before all filters in execution tree format"),
-            it("should return after all filters in execution tree format")
-      end)
-  end).
-%   [{group,254,"after_all spec",
-%       [{after_,255,all,#Fun<before_after_filter_spec.44.53736782>},
-%         {example,259,"should do stuff",
-%           #Fun<before_after_filter_spec.45.19509813>},
-%         {group,263,"nestedspec",
-%           [{after_,264,all,#Fun<before_after_filter_spec.46.81668172>},
-%             {example,268,"should do nested stuff",
-%               #Fun<before_after_filter_spec.47.50609279>}]}]}]
+        describe("filters", fun() ->
+              it("should return before each filters in execution tree format", fun() ->
+                    Filter = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    Fun2 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {before_, 1, each, Filter},
+                          {example, 2, "example1", Fun1},
+                          {example, 3, "example2", Fun2}
+                        ]}
+                    ],
+                    [
+                      {start_group, 1, "example spec"},
+                      {start_example, 2, "example1"},
+                      {run, Filter},
+                      {run, Fun1},
+                      {end_example, 2, "example1"},
+                      {start_example, 3, "example2"},
+                      {run, Filter},
+                      {run, Fun2},
+                      {end_example, 3, "example2"},
+                      {end_group, 1, "example spec"}
+                    ] = espec_ast:convert_to_execution_tree(AST)
+                end),
+
+              it("should return after each filters in execution tree format", fun() ->
+                    Filter = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    Fun2 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {after_, 1, each, Filter},
+                          {example, 2, "example1", Fun1},
+                          {example, 3, "example2", Fun2}
+                        ]}
+                    ],
+                    [
+                      {start_group, 1, "example spec"},
+                      {start_example, 2, "example1"},
+                      {run, Fun1},
+                      {run, Filter},
+                      {end_example, 2, "example1"},
+                      {start_example, 3, "example2"},
+                      {run, Fun2},
+                      {run, Filter},
+                      {end_example, 3, "example2"},
+                      {end_group, 1, "example spec"}
+                    ] = espec_ast:convert_to_execution_tree(AST)
+                end),
+
+              it("should return before all filters in execution tree format", fun() ->
+                    Filter = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    Fun2 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {before_, 1, all, Filter},
+                          {example, 2, "example1", Fun1},
+                          {example, 3, "example2", Fun2}
+                        ]}
+                    ],
+                    [
+                      {start_group, 1, "example spec"},
+                      {run, Filter},
+                      {start_example, 2, "example1"},
+                      {run, Fun1},
+                      {end_example, 2, "example1"},
+                      {start_example, 3, "example2"},
+                      {run, Fun2},
+                      {end_example, 3, "example2"},
+                      {end_group, 1, "example spec"}
+                    ] = espec_ast:convert_to_execution_tree(AST)
+                end),
+
+              it("should return after all filters in execution tree format", fun() ->
+                    Filter = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    Fun2 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {after_, 1, all, Filter},
+                          {example, 2, "example1", Fun1},
+                          {example, 3, "example2", Fun2}
+                        ]}
+                    ],
+                    [
+                      {start_group, 1, "example spec"},
+                      {start_example, 2, "example1"},
+                      {run, Filter},
+                      {end_example, 2, "example1"},
+                      {start_example, 3, "example2"},
+                      {run, Filter},
+                      {end_example, 3, "example2"},
+                      {run, Fun2},
+                      {end_group, 1, "example spec"}
+                    ] = espec_ast:convert_to_execution_tree(AST)
+                end)
+          end)
+    end).
