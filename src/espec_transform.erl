@@ -5,7 +5,6 @@
 parse_transform(AST, _Options) ->
   walk_head(AST).
 
-
 walk_head(AST) ->
   lists:map(fun walk_head_element/1, AST).
 
@@ -25,6 +24,9 @@ walk_spec_clause({clause, _LineNo, _Arguments, _Guards, Body}) ->
 walk_spec_body(Body) ->
   List = lists:map(fun walk_spec_statement/1, Body),
   erl_syntax:list(List).
+
+walk_spec_statement({call, LineNo, {atom, _LineNo2, it}, [{string, _LineNo3, Description}]}) ->
+  erl_syntax:tuple([erl_syntax:atom(pending), erl_syntax:integer(LineNo), erl_syntax:string(Description)]);
 
 walk_spec_statement({call, LineNo, {atom, _LineNo2, it}, [{string, _LineNo3, Description}, {'fun', _LineNo4, _Clauses} = Fun]}) ->
   erl_syntax:tuple([erl_syntax:atom(example), erl_syntax:integer(LineNo), erl_syntax:string(Description), Fun]);
