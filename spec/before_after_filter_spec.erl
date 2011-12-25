@@ -2,7 +2,7 @@
 -include("espec.hrl").
 
 spec() ->
-  describe("before and afters", fun() ->
+  describe("each filters", fun() ->
         it("should run before each before examples in current group and nested groups", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example_spec(), espec_null_listener:new(), espec_null_listener),
               [ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example] = get(before_each)
@@ -11,8 +11,10 @@ spec() ->
         it("should run after each after examples in current group and nested group", fun() ->
               espec:run_spec(after_each_example_spec, after_each_example_spec(), espec_null_listener:new(), espec_null_listener),
               [example, ran_after_each, nested_example, ran_after_each_nested, ran_after_each] = get(after_each)
-          end),
+          end)
+    end),
 
+  describe("all filters", fun() ->
         it("should run before all once before all examples in the current group and nested groups", fun() ->
               espec:run_spec(before_all_example_spec, before_all_example_spec(), espec_null_listener:new(), espec_null_listener),
               [ran_before_all, example, ran_before_all_nested, nested_example] = get(before_all)
