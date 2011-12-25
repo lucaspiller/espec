@@ -15,30 +15,32 @@ run(Mods) when is_list(Mods) ->
 
 run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
-    run_spec(Spec).
+    run_spec(Mod, Spec).
 
 run(Mod, ListenerState, ListenerModule) ->
     Spec = Mod:spec(),
-    run_spec(Spec, ListenerState, ListenerModule).
+    run_spec(Mod, Spec, ListenerState, ListenerModule).
 
 run(Mod, LineNo) ->
     Spec = filter_groups_by_line(LineNo, Mod:spec()),
-    run_spec(Spec).
+    run_spec(Mod, Spec).
 
 run_no_shell(Mods) ->
     lists:foreach(fun(Mod) ->
         Spec = Mod:spec(),
-        run_spec(Spec, espec_console_listener:new(true), espec_console_listener)
+        run_spec(Mod, Spec, espec_console_listener:new(true), espec_console_listener)
     end, Mods),
     halt().
 
-run_spec(Spec) ->
-    run_spec(Spec, espec_console_listener:new(), espec_console_listener).
+run_spec(Mod, Spec) ->
+    run_spec(Mod, Spec, espec_console_listener:new(), espec_console_listener).
 
-run_spec(Spec, ListenerState0, ListenerModule) ->
-    lists:foldl(fun({Description, Children}, GroupListenerState) ->
+run_spec(Mod, Spec, ListenerState0, ListenerModule) ->
+    ListenerState1 = ListenerModule:start_spec(Mod, ListenerState0),
+    ListenerState2 = lists:foldl(fun({Description, Children}, GroupListenerState) ->
           run_group(GroupListenerState, ListenerModule, Description, [], [], Children)
-    end, ListenerState0, extract_groups(Spec)).
+    end, ListenerState1, extract_groups(Spec)),
+    ListenerModule:end_spec(Mod, ListenerState2).
 
 run_group(ListenerState0, ListenerModule, GroupDescription, Befores, Afters, Children) ->
     ListenerState1 = ListenerModule:start_group(GroupDescription, ListenerState0),

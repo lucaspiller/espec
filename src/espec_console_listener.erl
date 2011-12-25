@@ -1,6 +1,6 @@
 -module(espec_console_listener).
 -behaviour(espec_listener).
--export([start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0, new/1]).
+-export([start_spec/2, end_spec/2, start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0, new/1]).
 
 -record(state, {color = false, indentation = 0}).
 
@@ -10,6 +10,13 @@ new(Color) ->
 
 new() ->
   #state{}.
+
+start_spec(Name, #state{indentation = Indentation} = State) ->
+  io:format(user, "~s~s~n", [indentation(Indentation), Name]),
+  State#state{indentation = Indentation + 1}.
+
+end_spec(_Name, #state{indentation = Indentation} = State) ->
+  State#state{indentation = Indentation - 1}.
 
 start_example(_Description, State) ->
   State.

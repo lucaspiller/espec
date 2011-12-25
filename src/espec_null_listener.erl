@@ -1,11 +1,17 @@
 -module(espec_null_listener).
 -behaviour(espec_listener).
--export([start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0]).
+-export([start_spec/2,end_spec/2,start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0]).
 
 
 
 new() ->
   null_listener.
+
+start_spec(_Name, State) ->
+  State.
+
+end_spec(_Name, State) ->
+  State.
 
 start_example(_Description, State) ->
   State.
