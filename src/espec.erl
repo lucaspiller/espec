@@ -3,6 +3,8 @@
 -export([
         run/1,
         run/2,
+        run/3,
+        run_no_shell/1,
         filter_groups_by_line/2
     ]).
 
@@ -15,37 +17,48 @@ run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
     run_spec(Spec).
 
+run(Mod, ListenerState, ListenerModule) ->
+    Spec = Mod:spec(),
+    run_spec(Spec, ListenerState, ListenerModule).
+
 run(Mod, LineNo) ->
     Spec = filter_groups_by_line(LineNo, Mod:spec()),
     run_spec(Spec).
 
-run_spec(Spec) ->
-    lists:foreach(fun({Description, Children}) ->
-        run_group(0, Description, [], [], Children)
-    end, extract_groups(Spec)).
+run_no_shell(Mods) ->
+    lists:foreach(fun(Mod) ->
+        Spec = Mod:spec(),
+        run_spec(Spec, espec_console_listener:new(true), espec_console_listener)
+    end, Mods),
+    halt().
 
-   
-run_group(Indentation, GroupDescription, Befores, Afters, Children) ->
-    io:format(user, "~s~s\n", [indentation(Indentation), GroupDescription]),
+run_spec(Spec) ->
+    run_spec(Spec, espec_console_listener:new(), espec_console_listener).
+
+run_spec(Spec, ListenerState0, ListenerModule) ->
+    lists:foldl(fun({Description, Children}, GroupListenerState) ->
+          run_group(GroupListenerState, ListenerModule, Description, [], [], Children)
+    end, ListenerState0, extract_groups(Spec)).
+
+run_group(ListenerState0, ListenerModule, GroupDescription, Befores, Afters, Children) ->
+    ListenerState1 = ListenerModule:start_group(GroupDescription, ListenerState0),
     BeforeEach = Befores ++ extract_before_each(Children),
     AfterEach = Afters ++ extract_after_each(Children),
     run_before(extract_before_all(Children)),
-    lists:foreach(fun
-            ({example, _Line, Description, Fun}) ->
-                case run_test(Fun, BeforeEach, AfterEach) of
-                    ok ->
-                        io:format(user, "~s~s\n", [indentation(Indentation + 1), Description]);
-                    {error, {Class, Reason}} ->
-                        io:format(user, "~s~s (FAILED):\n~s~p ~p\n", [indentation(Indentation + 1), Description, indentation(Indentation + 2), Class, Reason])
-                end;
-            ({pending, _Line, Description}) ->
-                io:format(user, "~s~s (PENDING)\n", [indentation(Indentation + 1), Description])
-    end, extract_tests(Children)),
+    ListenerState2 = lists:foldl(fun
+            ({example, _Line, Description, Fun}, ExampleListenerState0) ->
+                ExampleListenerState1 = ListenerModule:start_example(Description, ExampleListenerState0),
+                Result = run_test(Fun, BeforeEach, AfterEach),
+                ListenerModule:end_example(Description, Result, ExampleListenerState1);
+            ({pending, _Line, Description}, ExampleListenerState0) ->
+                ListenerModule:pending_example(Description, ExampleListenerState0)
+    end, ListenerState1, extract_tests(Children)),
 
-    lists:foreach(fun({Description, SubChildren}) ->
-        run_group(Indentation + 1, Description, BeforeEach, AfterEach, SubChildren)
-    end, extract_groups(Children)),
-    run_after(extract_after_all(Children)).
+    ListenerState3 = lists:foldl(fun({Description, SubChildren}, GroupListenerState0) ->
+        run_group(GroupListenerState0, ListenerModule, Description, BeforeEach, AfterEach, SubChildren)
+    end, ListenerState2, extract_groups(Children)),
+    run_after(extract_after_all(Children)),
+    ListenerModule:end_group(GroupDescription, ListenerState3).
 
 extract_before_all([]) ->
     [];
@@ -124,9 +137,6 @@ run_functions(Error, Funs) ->
         Class:Reason ->
             throw({Error, {Class, Reason}})
     end.
-
-indentation(Depth) ->
-    lists:duplicate(Depth * 2, " ").
 
 is_setup(Part) ->
     Specifier = element(1, Part),
