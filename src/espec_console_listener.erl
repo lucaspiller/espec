@@ -1,15 +1,12 @@
 -module(espec_console_listener).
 -behaviour(espec_listener).
--export([start_spec/2, end_spec/2, start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0, new/1]).
+-export([start_spec/2, end_spec/2, start_example/2, end_example/3, pending_example/2, start_group/2, end_group/2, new/0]).
 
 -record(state, {color = false, indentation = 0}).
 
-
-new(Color) ->
-  #state{color = Color}.
-
 new() ->
-  #state{}.
+  Color = not is_running_in_shell(),
+  #state{color = Color}.
 
 start_spec(Name, #state{indentation = Indentation} = State) ->
   io:format(user, "~s~s~n", [indentation(Indentation), Name]),
@@ -75,3 +72,13 @@ red() ->
 
 yellow() ->
   "\e[0;33m".
+
+is_running_in_shell() ->
+  ProcessInfo = process_info(self()),
+  RootPid = list_to_pid("<0.0.0>"),
+  case proplists:get_value(links, ProcessInfo) of
+    [RootPid] ->
+      false;
+    _ ->
+      true
+  end.

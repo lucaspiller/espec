@@ -46,4 +46,4 @@ run_spec_files(SpecFiles) ->
                 Acc
         end
     end, [], SpecFiles),
-    espec:run_no_shell(Modules).
+    espec:run(Modules).

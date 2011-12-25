@@ -4,7 +4,6 @@
         run/1,
         run/2,
         run/3,
-        run_no_shell/1,
         run_spec/2,
         run_spec/4,
         filter_groups_by_line/2
@@ -26,13 +25,6 @@ run(Mod, ListenerState, ListenerModule) ->
 run(Mod, LineNo) ->
     Spec = filter_groups_by_line(LineNo, Mod:spec()),
     run_spec(Mod, Spec).
-
-run_no_shell(Mods) ->
-    lists:foreach(fun(Mod) ->
-        Spec = Mod:spec(),
-        run_spec(Mod, Spec, espec_console_listener:new(true), espec_console_listener)
-    end, Mods),
-    halt().
 
 run_spec(Mod, Spec) ->
     run_spec(Mod, Spec, espec_console_listener:new(), espec_console_listener).
