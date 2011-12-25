@@ -9,9 +9,9 @@ parse_transform(AST, _Options) ->
 walk_head(AST) ->
   lists:map(fun walk_head_element/1, AST).
 
-walk_head_element({function, LineNo, spec, 0, Clauses}) ->
+walk_head_element({function, LineNo, Method, 0, Clauses}) ->
   DS = walk_single_clause(Clauses),
-  {function, LineNo, spec, 0, [{clause, LineNo, [], [], [erl_syntax:revert(DS)]}]};
+  {function, LineNo, Method, 0, [{clause, LineNo, [], [], [erl_syntax:revert(DS)]}]};
 
 walk_head_element(El) ->
   El.
