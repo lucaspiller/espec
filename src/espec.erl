@@ -41,11 +41,11 @@ run_group(Indentation, GroupDescription, Befores, Afters, Children) ->
             ({pending, _Line, Description}) ->
                 io:format(user, "~s~s (PENDING)\n", [indentation(Indentation + 1), Description])
     end, extract_tests(Children)),
-    run_after(extract_after_all(Children)),
 
     lists:foreach(fun({Description, SubChildren}) ->
         run_group(Indentation + 1, Description, BeforeEach, AfterEach, SubChildren)
-    end, extract_groups(Children)).
+    end, extract_groups(Children)),
+    run_after(extract_after_all(Children)).
 
 extract_before_all([]) ->
     [];
