@@ -3,6 +3,37 @@
     convert_to_execution_tree/1
   ]).
 
+%
+% This module converts an abstract syntax tree representation of a spec
+% into a linear execution tree representation. For example we go from:
+%
+%   [{group,254,"after_all spec",
+%       [{after_,255,all,#Fun<before_after_filter_spec.44.53736782>},
+%         {example,259,"should do stuff",
+%           #Fun<before_after_filter_spec.45.19509813>},
+%         {group,263,"nestedspec",
+%           [{after_,264,all,#Fun<before_after_filter_spec.46.81668172>},
+%             {example,268,"should do nested stuff",
+%               #Fun<before_after_filter_spec.47.50609279>}]}]}]
+%
+% To:
+%
+%   [
+%     {start_group,254,"after_all spec"},
+%     {start_example,259,"should do stuff"},
+%     {run,#Fun<before_after_filter_spec.45.19509813>},
+%     {end_example,259,"should do stuff"},
+%     {start_group,263,"nestedspec"},
+%     {start_example,268,"should do nested stuff"},
+%     {run,#Fun<before_after_filter_spec.47.50609279>},
+%     {end_example,268,"should do nested stuff"},
+%     {run,#Fun<before_after_filter_spec.46.81668172>},
+%     {end_group,263,"nestedspec"},
+%     {run,#Fun<before_after_filter_spec.44.53736782>},
+%     {end_group,254,"after_all spec"}
+%   ]
+%
+
 convert_to_execution_tree(AST) ->
   lists:reverse(convert_to_execution_tree(AST, [])).
 
