@@ -9,7 +9,7 @@ run_spec_files_from_args(Args) ->
     
 -spec expand_files_from_args(list()) -> list().
 expand_files_from_args(FilesOrDirs) ->
-    lists:append(lists:map(fun(FileOrDir) ->
+    lists:flatmap(fun(FileOrDir) ->
         case filelib:is_dir(FileOrDir) of
             true ->
                 filelib:fold_files(FileOrDir, ?SPEC_FILE_REGEXP, true, fun(File, Acc) ->
@@ -18,7 +18,7 @@ expand_files_from_args(FilesOrDirs) ->
             false ->
                 [FileOrDir]
         end
-    end, FilesOrDirs)).
+    end, FilesOrDirs).
 
 -spec run_spec_files(list()) -> term().
 run_spec_files(SpecFiles) ->
