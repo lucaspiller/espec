@@ -1,6 +1,5 @@
--module(espec_espec).
+-module(espec_spec).
 -include("espec.hrl").
-
 -export([spec/0]).
 
 spec() ->

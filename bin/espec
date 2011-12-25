@@ -1,7 +1,7 @@
 #!/usr/bin/env escript
 %%! -smp enable -sname espec_runner -pa deps/*/ebin -pa ebin
 
--define(SPEC_FILE_REGEXP, ".*_espec.erl$").
+-define(SPEC_FILE_REGEXP, ".*_spec.erl$").
 
 main([]) ->
     usage();
