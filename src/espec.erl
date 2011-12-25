@@ -5,6 +5,8 @@
         run/2,
         run/3,
         run_no_shell/1,
+        run_spec/2,
+        run_spec/4,
         filter_groups_by_line/2
     ]).
 
