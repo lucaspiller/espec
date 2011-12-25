@@ -76,22 +76,22 @@ convert_to_execution_tree([{pending, Line, Description} | AST], Filters, Parsed)
 
 extract_filters_at_current_level([], Filters, Parsed) ->
   {Filters, lists:reverse(Parsed)};
-extract_filters_at_current_level([{before_, Line, each, Fun} | AST], Filters, Parsed) ->
+extract_filters_at_current_level([{before_, _Line, each, Fun} | AST], Filters, Parsed) ->
   InstructionTree = [
     {run, Fun}
   ],
   extract_filters_at_current_level(AST, [{before_each, InstructionTree} | Filters], Parsed);
-extract_filters_at_current_level([{after_, Line, each, Fun} | AST], Filters, Parsed) ->
+extract_filters_at_current_level([{after_, _Line, each, Fun} | AST], Filters, Parsed) ->
   InstructionTree = [
     {run, Fun}
   ],
   extract_filters_at_current_level(AST, [{after_each, InstructionTree} | Filters], Parsed);
-extract_filters_at_current_level([{before_, Line, all, Fun} | AST], Filters, Parsed) ->
+extract_filters_at_current_level([{before_, _Line, all, Fun} | AST], Filters, Parsed) ->
   InstructionTree = [
     {run, Fun}
   ],
   extract_filters_at_current_level(AST, [{before_all, InstructionTree} | Filters], Parsed);
-extract_filters_at_current_level([{after_, Line, all, Fun} | AST], Filters, Parsed) ->
+extract_filters_at_current_level([{after_, _Line, all, Fun} | AST], Filters, Parsed) ->
   InstructionTree = [
     {run, Fun}
   ],
