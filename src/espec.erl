@@ -67,7 +67,7 @@ execute_test(Fun) ->
         ok
     catch
         Class:Reason ->
-            {error, {Class, Reason}}
+            {error, {Class, Reason, erlang:get_stacktrace()}}
     end.
 
 is_setup(Part) ->

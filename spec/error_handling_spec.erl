@@ -5,21 +5,21 @@ spec() ->
   describe("badmatch errors", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, badmatch_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {error, {badmatch,false}}} = proplists:get_value("should fail", State)
+              {error, {error, {badmatch,false}, _}} = proplists:get_value("should fail", State)
           end)
     end),
 
   describe("throws", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, throw_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {throw, something_went_wrong}} = proplists:get_value("should fail", State)
+              {error, {throw, something_went_wrong, _}} = proplists:get_value("should fail", State)
           end)
     end),
 
   describe("exits", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, exit_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {exit, goodbye}} = proplists:get_value("should fail", State)
+              {error, {exit, goodbye, _}} = proplists:get_value("should fail", State)
           end)
     end).
 
