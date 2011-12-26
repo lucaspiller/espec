@@ -16,7 +16,13 @@ spec() ->
         it("should run before examples in current group and nested groups", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example3_spec(), espec_null_listener:new(), espec_null_listener),
               [ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example] = get(before_each3)
+          end),
+
+        it("should run 'outer before' before each example in the nested group", fun() ->
+              espec:run_spec(before_each_example_spec, before_each_example4_spec(), espec_null_listener:new(), espec_null_listener),
+              [ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example, ran_before_each, ran_before_each_nested, nested_example2] = get(before_each4)
           end)
+
     end),
 
   describe("after each filters", fun() ->
@@ -51,6 +57,8 @@ spec() ->
               espec:run_spec(before_all_example_spec, before_all_example3_spec(), espec_null_listener:new(), espec_null_listener),
               [ran_before_all, example, ran_before_all_nested, nested_example] = get(before_all3)
           end)
+
+
     end),
 
   describe("after all filters", fun() ->
@@ -127,8 +135,35 @@ before_each_example3_spec() ->
               it("should do nested stuff", fun() ->
                     append(nested_example, before_each3)
                 end)
+
           end)
     end).
+
+before_each_example4_spec() ->
+  describe("before_each spec", fun() ->
+        before_each(fun() ->
+              append(ran_before_each, before_each4)
+          end),
+
+        it("should do stuff", fun() ->
+              append(example, before_each4)
+          end),
+
+        describe("nestedspec", fun() ->
+              before_each(fun() ->
+                    append(ran_before_each_nested, before_each4)
+                end),
+
+              it("should do nested stuff", fun() ->
+                    append(nested_example, before_each4)
+                end),
+
+              it("should do more nested stuff", fun() ->
+                    append(nested_example2, before_each4)
+              end)
+          end)
+    end).
+
 
 after_each_example1_spec() ->
   describe("after_each spec", fun() ->
