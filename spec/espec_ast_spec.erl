@@ -213,8 +213,8 @@ spec() ->
                       {run, Fun1},
                       {end_example, 2, "example1"},
                       {start_group, 3, "nested example spec"},
-                      {run, Filter},
                       {start_example, 4, "example2"},
+                      {run, Filter},
                       {run, Fun2},
                       {end_example, 4, "example2"},
                       {end_group, 3, "nested example spec"},
@@ -244,8 +244,8 @@ spec() ->
                       {start_group, 3, "nested example spec"},
                       {start_example, 4, "example2"},
                       {run, Fun2},
-                      {end_example, 4, "example2"},
                       {run, Filter},
+                      {end_example, 4, "example2"},
                       {end_group, 3, "nested example spec"},
                       {end_group, 1, "example spec"}
                     ] = espec_ast:convert_to_execution_tree(AST)
