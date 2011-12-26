@@ -6,7 +6,12 @@ spec() ->
         it("should recursively expand a directory", fun() ->
             Examples = espec_bin:expand_files_from_args(["spec"]),
             true = lists:any(fun(File) ->
-                  File == "spec/expand_args_spec.erl"
+                  File == {"spec/expand_args_spec.erl", all}
             end, Examples)
+        end),
+
+      it("should process line number for files", fun() ->
+            Examples = espec_bin:expand_files_from_args(["spec/expand_args_spec:45", "spec/before_after_filter_spec.erl"]),
+            lists:sort(Examples) = lists:sort([{"spec/expand_args_spec", 45}, {"spec/before_after_filter_spec.erl", all}])
         end)
     end).
