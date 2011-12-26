@@ -32,34 +32,51 @@ run_spec(Mod, Spec) ->
 run_spec(Mod, Spec, ListenerState0, ListenerModule) ->
     ExecutionTree = espec_ast:convert_to_execution_tree(Spec),
     ListenerState1 = ListenerModule:start_spec(Mod, ListenerState0),
-    ListenerState2 = run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok),
+    ListenerState2 = run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok, 0),
     ListenerModule:end_spec(Mod, ListenerState2).
 
-run_execution_tree([], ListenerState0, _, _) ->
+pop_error_stack(Result0, FailTestDepth0) ->
+    case FailTestDepth0 of
+      0 ->
+        {ok, 0};
+      _ ->
+        {Result0, FailTestDepth0 - 1}
+    end.
+push_error_stack(Result0, FailTestDepth0) ->
+    case {Result0, FailTestDepth0} of
+       {ok, 0} -> 0;
+       _ -> FailTestDepth0 + 1
+    end.
+
+run_execution_tree([], ListenerState0, _, _, _) ->
     ListenerState0;
-run_execution_tree([{start_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, _) ->
+run_execution_tree([{start_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0) ->
     ListenerState1 = ListenerModule:start_group(GroupDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok);
-run_execution_tree([{end_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, _) ->
+    FailTestDepth = push_error_stack(Result, FailTestDepth0),
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
+run_execution_tree([{end_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0) ->
     ListenerState1 = ListenerModule:end_group(GroupDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok);
+    {Result, FailTestDepth} = pop_error_stack(Result0, FailTestDepth0),
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
 
-run_execution_tree([{pending_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, _) ->
+run_execution_tree([{pending_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth) ->
     ListenerState1 = ListenerModule:pending_example(ExampleDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok);
-run_execution_tree([{start_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, _) ->
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
+run_execution_tree([{start_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0) ->
+    FailTestDepth = push_error_stack(Result, FailTestDepth0),
     ListenerState1 = ListenerModule:start_example(ExampleDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok);
-run_execution_tree([{end_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result) ->
-    ListenerState1 = ListenerModule:end_example(ExampleDescription, Result, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok);
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
+run_execution_tree([{end_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0) ->
+    ListenerState1 = ListenerModule:end_example(ExampleDescription, Result0, ListenerState0),
+    {Result, FailTestDepth} = pop_error_stack(Result0, FailTestDepth0),
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
 
-run_execution_tree([{run, Fun} | ExecutionTree], ListenerState0, ListenerModule, ok) ->
+run_execution_tree([{run, Fun} | ExecutionTree], ListenerState0, ListenerModule, ok, 0 = FailTestDepth) ->
     Result = execute_test(Fun),
-    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Result);
-run_execution_tree([{run, _} | ExecutionTree], ListenerState0, ListenerModule, Error) ->
+    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Result, FailTestDepth);
+run_execution_tree([{run, _} | ExecutionTree], ListenerState0, ListenerModule, Error, FailTestDepth) ->
     % Don't run a fun if there are existing errors
-    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Error).
+    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Error, FailTestDepth).
 
 execute_test(Fun) ->
     try

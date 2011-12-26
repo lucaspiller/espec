@@ -28,15 +28,21 @@ spec() ->
               State = espec:run_spec(before_all_handling_spec, before_all_handling_spec(), espec_null_listener:new(), espec_null_listener),
               [before_all] = get(before_all_handling_spec),
               {error,{throw,something_went_wrong}} =  proplists:get_value("should do stuff", State)
+        end),
+
+        it("should not break tests in an outer context if a before all fails", fun() ->
+              _State = espec:run_spec(before_all_nested_handling_spec, before_all_nested_handling_spec(), espec_null_listener:new(), espec_null_listener),
+              [example1, before_all, example2] = get(before_all_nested_handling_spec)
         end)
   end),
 
   describe("after all filter errors", fun() ->
-        it("should treat the test as succeeded but flag the after all as failing", fun() ->
+        it("should treat the test as succeeded", fun() ->
               _State = espec:run_spec(after_all_handling_spec, after_all_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [should_do_stuff, after_all] = get(after_all_handling_spec),
-              throw(also_need_to_check_listener_for_after_all_failure)
-        end)
+              [should_do_stuff, after_all] = get(after_all_handling_spec)
+        end),
+
+        it("should flag the after all as failing")
   end),
 
   describe("before each filter errors", fun() ->
@@ -54,6 +60,7 @@ spec() ->
               {error, {throw, something_went_wrong}} = proplists:get_value("should do stuff", State)
         end)
   end).
+
 
 %
 % Example specs for testing
@@ -101,6 +108,35 @@ before_all_handling_spec() ->
           throw(something_went_wrong)
       end)
   end).
+
+before_all_nested_handling_spec() ->
+  describe("before all nested handling", fun() ->
+      it("should do stuff", fun() ->
+          spec_helper:append(example1, before_all_nested_handling_spec)
+      end),
+
+      describe("nested stuff", fun() ->
+          it("should do nested stuff", fun() ->
+              spec_helper:append(should_do_nested_stuff, before_all_nested_handling_spec)
+          end),
+
+          it("should do other nested stuff", fun() ->
+              spec_helper:append(should_do_other_nested_stuff, before_all_nested_handling_spec)
+          end),
+          
+          before_all(fun() ->
+              spec_helper:append(before_all, before_all_nested_handling_spec),
+              throw(something_went_wrong)
+          end)
+
+      end),
+     
+      it("should do other stuff", fun() ->
+         spec_helper:append(example2, before_all_nested_handling_spec)
+      end)
+
+  end).
+
 
 
 after_all_handling_spec() ->
