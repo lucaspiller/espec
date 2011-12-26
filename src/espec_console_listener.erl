@@ -22,8 +22,8 @@ end_example(Description, Result, #state{indentation = Indentation} = State) ->
   case Result of 
     ok ->
       io:format(user, "~s~s~s~s\n", [success_color(State), indentation(Indentation + 1), Description, no_color(State)]);
-    {error, {Class, Reason}} ->
-      io:format(user, "~s~s~s (FAILED):\n~s~p ~p~s\n", [failure_color(State), indentation(Indentation + 1), Description, indentation(Indentation + 2), Class, Reason, no_color(State)])
+    {error, {Class, Reason, Stacktrace}} ->
+      io:format(user, "~s~s~s (FAILED):\n~s~p ~p\n~s~p~s\n", [failure_color(State), indentation(Indentation + 1), Description, indentation(Indentation + 2), Class, Reason, indentation(Indentation + 2), Stacktrace, no_color(State)])
   end,
 
   State.

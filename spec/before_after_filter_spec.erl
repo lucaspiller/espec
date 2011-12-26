@@ -74,105 +74,97 @@ spec() ->
 % Example specs for testing
 %
 
-% TODO something built in for this?
-append(Atom, Name) ->
-  case get(Name) of
-    undefined ->
-      put(Name, [Atom]);
-    List ->
-      put(Name, List ++ [Atom])
-  end.
-
 before_each_example1_spec() ->
   describe("before_each spec", fun() ->
         before_each(fun() ->
-              append(ran_before_each, before_each1)
+              spec_helper:append(ran_before_each, before_each1)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, before_each1)
+              spec_helper:append(example1, before_each1)
           end)
   end).
 
 before_each_example2_spec() ->
   describe("before_each spec", fun() ->
         before_each(fun() ->
-              append(ran_before_each, before_each2)
+              spec_helper:append(ran_before_each, before_each2)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, before_each2)
+              spec_helper:append(example1, before_each2)
           end),
 
         it("should do stuff example2", fun() ->
-              append(example2, before_each2)
+              spec_helper:append(example2, before_each2)
           end)
   end).
 
 before_each_example3_spec() ->
   describe("before_each spec", fun() ->
         before_each(fun() ->
-              append(ran_before_each, before_each3)
+              spec_helper:append(ran_before_each, before_each3)
           end),
 
         it("should do stuff", fun() ->
-              append(example, before_each3)
+              spec_helper:append(example, before_each3)
           end),
 
         describe("nestedspec", fun() ->
               before_each(fun() ->
-                    append(ran_before_each_nested, before_each3)
+                    spec_helper:append(ran_before_each_nested, before_each3)
                 end),
 
               it("should do nested stuff", fun() ->
-                    append(nested_example, before_each3)
-                end)
+                    spec_helper:append(nested_example, before_each3)
+              end)
+
           end)
     end).
 
 after_each_example1_spec() ->
   describe("after_each spec", fun() ->
         after_each(fun() ->
-              append(ran_after_each, after_each1)
+              spec_helper:append(ran_after_each, after_each1)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, after_each1)
+              spec_helper:append(example1, after_each1)
           end)
   end).
 
 after_each_example2_spec() ->
   describe("after_each spec", fun() ->
         after_each(fun() ->
-              append(ran_after_each, after_each2)
+              spec_helper:append(ran_after_each, after_each2)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, after_each2)
+              spec_helper:append(example1, after_each2)
           end),
 
         it("should do stuff example2", fun() ->
-              append(example2, after_each2)
+              spec_helper:append(example2, after_each2)
           end)
   end).
 
 after_each_example3_spec() ->
   describe("after_each spec", fun() ->
         after_each(fun() ->
-              append(ran_after_each, after_each3)
+              spec_helper:append(ran_after_each, after_each3)
           end),
 
         it("should do stuff", fun() ->
-              append(example, after_each3)
+              spec_helper:append(example, after_each3)
           end),
 
         describe("nestedspec", fun() ->
               after_each(fun() ->
-                    append(ran_after_each_nested, after_each3)
+                    spec_helper:append(ran_after_each_nested, after_each3)
                 end),
 
               it("should do nested stuff", fun() ->
-                    append(nested_example, after_each3)
+                    spec_helper:append(nested_example, after_each3)
                 end)
           end)
     end).
@@ -180,46 +172,46 @@ after_each_example3_spec() ->
 before_all_example1_spec() ->
   describe("before_all spec", fun() ->
         before_all(fun() ->
-              append(ran_before_all, before_all1)
+              spec_helper:append(ran_before_all, before_all1)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, before_all1)
+              spec_helper:append(example1, before_all1)
           end)
   end).
 
 before_all_example2_spec() ->
   describe("before_all spec", fun() ->
         before_all(fun() ->
-              append(ran_before_all, before_all2)
+              spec_helper:append(ran_before_all, before_all2)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, before_all2)
+              spec_helper:append(example1, before_all2)
           end),
 
         it("should do stuff example2", fun() ->
-              append(example2, before_all2)
+              spec_helper:append(example2, before_all2)
           end)
   end).
 
 before_all_example3_spec() ->
   describe("before_all spec", fun() ->
         before_all(fun() ->
-              append(ran_before_all, before_all3)
+              spec_helper:append(ran_before_all, before_all3)
           end),
 
         it("should do stuff", fun() ->
-              append(example, before_all3)
+              spec_helper:append(example, before_all3)
           end),
 
         describe("nestedspec", fun() ->
               before_all(fun() ->
-                    append(ran_before_all_nested, before_all3)
+                    spec_helper:append(ran_before_all_nested, before_all3)
                 end),
 
               it("should do nested stuff", fun() ->
-                    append(nested_example, before_all3)
+                    spec_helper:append(nested_example, before_all3)
                 end)
           end)
     end).
@@ -227,46 +219,46 @@ before_all_example3_spec() ->
 after_all_example1_spec() ->
   describe("after_all spec", fun() ->
         after_all(fun() ->
-              append(ran_after_all, after_all1)
+              spec_helper:append(ran_after_all, after_all1)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, after_all1)
+              spec_helper:append(example1, after_all1)
           end)
   end).
 
 after_all_example2_spec() ->
   describe("after_all spec", fun() ->
         after_all(fun() ->
-              append(ran_after_all, after_all2)
+              spec_helper:append(ran_after_all, after_all2)
           end),
 
         it("should do stuff example1", fun() ->
-              append(example1, after_all2)
+              spec_helper:append(example1, after_all2)
           end),
 
         it("should do stuff example2", fun() ->
-              append(example2, after_all2)
+              spec_helper:append(example2, after_all2)
           end)
   end).
 
 after_all_example_spec() ->
   describe("after_all spec", fun() ->
         after_all(fun() ->
-              append(ran_after_all, after_all3)
+              spec_helper:append(ran_after_all, after_all3)
           end),
 
         it("should do stuff", fun() ->
-              append(example, after_all3)
+              spec_helper:append(example, after_all3)
           end),
 
         describe("nestedspec", fun() ->
               after_all(fun() ->
-                    append(ran_after_all_nested, after_all3)
+                    spec_helper:append(ran_after_all_nested, after_all3)
                 end),
 
               it("should do nested stuff", fun() ->
-                    append(nested_example, after_all3)
+                    spec_helper:append(nested_example, after_all3)
                 end)
           end)
     end).

@@ -2,7 +2,6 @@
 
 -export([
         run/1,
-        run/2,
         run/3,
         run_spec/2,
         run_spec/4,
@@ -16,15 +15,20 @@ run(Mods) when is_list(Mods) ->
 
 run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
-    run_spec(Mod, Spec).
+    run_spec(Mod, Spec);
 
+run({Mod, all}) ->
+    %% disturbingly we don't seem to need this case statement because
+    %% of the way ordering of numerics and atoms work. but we should
+    %% keep it because it is bound to create a bug in the future :)
+    run(Mod);
+run({Mod, LineNo}) ->
+    Spec = filter_groups_by_line(LineNo, Mod:spec()),
+    run_spec(Mod, Spec).
+        
 run(Mod, ListenerState, ListenerModule) ->
     Spec = Mod:spec(),
     run_spec(Mod, Spec, ListenerState, ListenerModule).
-
-run(Mod, LineNo) ->
-    Spec = filter_groups_by_line(LineNo, Mod:spec()),
-    run_spec(Mod, Spec).
 
 run_spec(Mod, Spec) ->
     run_spec(Mod, Spec, espec_console_listener:new(), espec_console_listener).
@@ -67,7 +71,7 @@ execute_test(Fun) ->
         ok
     catch
         Class:Reason ->
-            {error, {Class, Reason}}
+            {error, {Class, Reason, erlang:get_stacktrace()}}
     end.
 
 is_setup(Part) ->
