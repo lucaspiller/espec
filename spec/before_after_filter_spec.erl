@@ -26,7 +26,13 @@ spec() ->
         it("should run multiple before each filters", fun() ->
               espec:run_spec(before_each_multiple_before_filter_spec, before_each_multiple_before_filter_spec(), espec_null_listener:new(), espec_null_listener),
               [ran_before_each, ran_before_each2, example] = get(before_each_multiple_before_filter)
+        end),
+
+        it("should run 'outer outer before' and 'outer before' before each example in the doubly nested group", fun() ->
+              espec:run_spec(before_each_double_nested_filter_spec, before_each_double_nested_filter_spec(), espec_null_listener:new(), espec_null_listener),
+              [ran_before_each, ran_before_each2, ran_before_each3, example, ran_before_each, ran_before_each2, ran_before_each3, example2] = get(before_each_double_nested_filter)
         end)
+
 
     end),
 
@@ -49,6 +55,13 @@ spec() ->
         it("should run multiple after each filters", fun() ->
               espec:run_spec(after_each_multiple_after_filter_spec, after_each_multiple_after_filter_spec(), espec_null_listener:new(), espec_null_listener),
               [example, ran_after_each2, ran_after_each] = get(after_each_multiple_after_filter)
+        end),
+
+        it("should run 'outer after' after each example in the nested group", fun() ->
+              espec:run_spec(after_each_nested_spec, after_each_nested_spec(), espec_null_listener:new(), espec_null_listener),
+              [example,  ran_after_each2, ran_after_each,
+               nested_example, ran_after_each_nested, ran_after_each2, ran_after_each, 
+               nested_example2,  ran_after_each_nested, ran_after_each2, ran_after_each] = get(after_each_nested)
         end)
 
 
@@ -205,6 +218,35 @@ before_each_multiple_before_filter_spec() ->
 
     end).
 
+before_each_double_nested_filter_spec() ->
+  describe("before_each spec", fun() ->
+        before_each(fun() ->
+              append(ran_before_each, before_each_double_nested_filter)
+          end),
+
+        describe("nested", fun() ->
+              before_each(fun() ->
+                    append(ran_before_each2, before_each_double_nested_filter)
+              end),
+
+              describe("double nested", fun() ->
+                    before_each(fun() ->
+                          append(ran_before_each3, before_each_double_nested_filter)
+                    end),
+
+                  it("should do stuff", fun() ->
+                      append(example, before_each_double_nested_filter)
+                  end),
+
+                  it("should do more stuff", fun() ->
+                      append(example2, before_each_double_nested_filter)
+                  end)
+              end)
+        end)
+
+    end).
+
+
 after_each_multiple_after_filter_spec() ->
   describe("after_each spec", fun() ->
         after_each(fun() ->
@@ -220,6 +262,37 @@ after_each_multiple_after_filter_spec() ->
           end)
 
     end).
+
+after_each_nested_spec() ->
+  describe("after_each spec", fun() ->
+        after_each(fun() ->
+              append(ran_after_each, after_each_nested)
+          end),
+
+        after_each(fun() ->
+              append(ran_after_each2, after_each_nested)
+        end),
+
+        it("should do stuff", fun() ->
+              append(example, after_each_nested)
+        end),
+
+        describe("nested", fun() ->
+              after_each(fun() ->
+                    append(ran_after_each_nested, after_each_nested)
+              end),
+
+              it("should do nested stuff", fun() ->
+                    append(nested_example, after_each_nested)
+              end),
+
+              it("should do more nested stuff", fun() ->
+                    append(nested_example2, after_each_nested)
+              end)
+         end)
+
+    end).
+
 
 after_all_multiple_after_filter_spec() ->
   describe("after_all spec", fun() ->
