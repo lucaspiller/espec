@@ -35,44 +35,42 @@
 %
 
 convert_to_execution_tree(AST) ->
-  lists:reverse(convert_to_execution_tree(AST, [])).
+  lists:reverse(convert_to_execution_tree(AST, [], [], [])).
 
-convert_to_execution_tree(AST, []) ->
+convert_to_execution_tree(AST, [], Befores, Afters) ->
   {Filters, ASTWithoutFilters} = extract_filters_at_current_level(AST, [], []),
   Parsed = [proplists:get_all_values(before_all, Filters)],
-  ExecutionTree = convert_to_execution_tree(ASTWithoutFilters, Filters, Parsed),
+  ExecutionTree = convert_to_execution_tree(ASTWithoutFilters, Filters, Parsed, Befores, Afters),
   lists:flatten([lists:reverse(proplists:get_all_values(after_all, Filters)) | ExecutionTree]).
 
-convert_to_execution_tree([], _, Parsed) ->
+convert_to_execution_tree([], _, Parsed, _, _) ->
   lists:flatten(Parsed);
-convert_to_execution_tree([{group, Line, Description, Body} | AST], Filters, Parsed) ->
-  BodyExecutionTree = convert_to_execution_tree(Body, []),
-  BeforeInstruction = proplists:get_all_values(before_each, Filters),
-  AfterInstruction = proplists:get_all_values(after_each, Filters),
+convert_to_execution_tree([{group, Line, Description, Body} | AST], Filters, Parsed, Befores0, Afters0) ->
+  Befores = proplists:get_all_values(before_each, Filters) ++ Befores0,
+  Afters = proplists:get_all_values(after_each, Filters) ++ Afters0,
+  BodyExecutionTree = convert_to_execution_tree(Body, [], Befores, Afters),
   InstructionTree = [
     {end_group, Line, Description},
-    AfterInstruction,
     BodyExecutionTree,
-    BeforeInstruction,
     {start_group, Line, Description}
   ],
-  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed]);
-convert_to_execution_tree([{example, Line, Description, Fun} | AST], Filters, Parsed) ->
-  BeforeInstruction = proplists:get_all_values(before_each, Filters),
-  AfterInstruction = lists:reverse(proplists:get_all_values(after_each, Filters)),
+  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed], Befores0, Afters0);
+convert_to_execution_tree([{example, Line, Description, Fun} | AST], Filters, Parsed, Befores0, Afters0) ->
+  BeforeInstruction = proplists:get_all_values(before_each, Filters) ++ Befores0,
+  AfterInstruction =   proplists:get_all_values(after_each, Filters) ++ Afters0,
   InstructionTree = [
     {end_example, Line, Description},
-    AfterInstruction,
+    lists:reverse(AfterInstruction),
     {run, Fun},
     BeforeInstruction,
     {start_example, Line, Description}
   ],
-  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed]);
-convert_to_execution_tree([{pending, Line, Description} | AST], Filters, Parsed) ->
+  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed], Befores0, Afters0);
+convert_to_execution_tree([{pending, Line, Description} | AST], Filters, Parsed, Befores0, Afters0) ->
   InstructionTree = [
     {pending_example, Line, Description}
   ],
-  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed]).
+  convert_to_execution_tree(AST, Filters, [InstructionTree | Parsed], Befores0, Afters0).
 
 extract_filters_at_current_level([], Filters, Parsed) ->
   {Filters, lists:reverse(Parsed)};
