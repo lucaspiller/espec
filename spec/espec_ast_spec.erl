@@ -54,6 +54,50 @@ spec() ->
           end),
 
         describe("filters", fun() ->
+              it("should handle multiple before each filters", fun() ->
+                    Filter1 = fun() -> ok end,
+                    Filter2 = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {before_, 1, each, Filter1},
+                          {before_, 2, each, Filter2},
+                          {example, 3, "example1", Fun1}
+                      ]}
+                  ],
+                  [
+                    {start_group, 1, "example spec"},
+                    {start_example, 3, "example1"},
+                    {run, Filter1},
+                    {run, Filter2},
+                    {run, Fun1},
+                    {end_example, 3, "example1"},
+                    {end_group, 1, "example spec"}
+                  ] = espec_ast:convert_to_execution_tree(AST)
+              end),
+
+              it("should handle multiple after each filters", fun() ->
+                    Filter1 = fun() -> ok end,
+                    Filter2 = fun() -> ok end,
+                    Fun1 = fun() -> ok end,
+                    AST = [
+                      {group, 1, "example spec", [
+                          {after_, 1, each, Filter1},
+                          {after_, 2, each, Filter2},
+                          {example, 3, "example1", Fun1}
+                      ]}
+                  ],
+                  [
+                    {start_group, 1, "example spec"},
+                    {start_example, 3, "example1"},
+                    {run, Fun1},
+                    {run, Filter2},
+                    {run, Filter1},
+                    {end_example, 3, "example1"},
+                    {end_group, 1, "example spec"}
+                  ] = espec_ast:convert_to_execution_tree(AST)
+              end),
+
               it("should return before each filters in execution tree format", fun() ->
                     Filter = fun() -> ok end,
                     Fun1 = fun() -> ok end,
