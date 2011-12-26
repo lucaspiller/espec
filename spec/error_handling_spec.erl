@@ -20,7 +20,14 @@ spec() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, exit_error_example_spec(), espec_null_listener:new(), espec_null_listener),
               {error, {exit, goodbye}} = proplists:get_value("should fail", State)
-          end)
+        end),
+
+        it("should not propagate error to next spec", fun() ->
+              State = espec:run_spec(error_should_not_propagate_to_next_example_spec, error_should_not_propagate_to_next_example_spec(),
+                 espec_null_listener:new(), espec_null_listener),
+              {error, {exit, goodbye}} = proplists:get_value("should fail", State),
+              ok =  proplists:get_value("should not fail", State)
+        end)
     end),
 
   describe("before all filter errors", fun() ->
@@ -172,4 +179,15 @@ exit_error_example_spec() ->
       it("should fail", fun() ->
             exit(goodbye)
       end)
+  end).
+
+error_should_not_propagate_to_next_example_spec() ->
+  describe("no propagation", fun() ->
+     it("should fail", fun() ->
+       exit(goodbye)
+     end),
+   
+     it("should not fail", fun() ->
+       ok
+     end)
   end).
