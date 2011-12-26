@@ -45,11 +45,32 @@ spec() ->
               [before_each] = get(before_each_handling_spec),
               {error,{throw,something_went_wrong}} =  proplists:get_value("should do stuff", State)
         end)
+  end),
+
+  describe("after each filter errors", fun() ->
+        it("should treat the test as failed if an after each fails", fun() ->
+              State = espec:run_spec(after_each_handling_spec, after_each_handling_spec(), espec_null_listener:new(), espec_null_listener),
+              [should_do_stuff, after_each] = get(after_each_handling_spec),
+              {error, {throw, something_went_wrong}} = proplists:get_value("should do stuff", State)
+        end)
   end).
 
 %
 % Example specs for testing
 %
+
+after_each_handling_spec() ->
+  describe("after each handling", fun() ->
+      it("should do stuff", fun() ->
+            spec_helper:append(should_do_stuff, after_each_handling_spec)
+      end),
+
+      after_each(fun() ->
+          spec_helper:append(after_each, after_each_handling_spec),
+          throw(something_went_wrong)
+      end)
+  end).
+
 
 before_each_handling_spec() ->
   describe("before each handling", fun() ->
