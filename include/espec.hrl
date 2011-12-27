@@ -1,2 +1,4 @@
 -compile([{parse_transform, espec_transform}]).
 -export([spec/0]).
+-define(EUNIT_NOAUTO, true).
+-include_lib("eunit/include/eunit.hrl").
