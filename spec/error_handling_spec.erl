@@ -5,36 +5,36 @@ spec() ->
   describe("badmatch errors", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, badmatch_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {error, {badmatch,false}, _}} = proplists:get_value("should fail", State)
+              ?_assertMatch({error, {error, {badmatch,false}, _}}, proplists:get_value("should fail", State))
           end)
     end),
 
   describe("throws", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, throw_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {throw, something_went_wrong, _}} = proplists:get_value("should fail", State)
+              ?_assertMatch({error, {throw, something_went_wrong, _}}, proplists:get_value("should fail", State))
           end)
     end),
 
   describe("exits", fun() ->
         it("should be caught and returned", fun() ->
               State = espec:run_spec(error_example_spec, exit_error_example_spec(), espec_null_listener:new(), espec_null_listener),
-              {error, {exit, goodbye, _}} = proplists:get_value("should fail", State)
+              ?_assertMatch({error, {exit, goodbye, _}}, proplists:get_value("should fail", State))
         end),
 
         it("should not propagate error to next spec", fun() ->
               State = espec:run_spec(error_should_not_propagate_to_next_example_spec, error_should_not_propagate_to_next_example_spec(),
                  espec_null_listener:new(), espec_null_listener),
-              {error, {exit, goodbye, _}} = proplists:get_value("should fail", State),
-              ok =  proplists:get_value("should not fail", State)
+              ?_assertMatch({error, {exit, goodbye, _}}, proplists:get_value("should fail", State)),
+              ?_assertEqual(ok, proplists:get_value("should not fail", State))
         end)
     end),
 
   describe("before all filter errors", fun() ->
         it("should treat the tests as failing if a before all fails", fun() ->
               State = espec:run_spec(before_all_handling_spec, before_all_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [before_all] = get(before_all_handling_spec),
-              {error,{throw,something_went_wrong, _}} =  proplists:get_value("should do stuff", State)
+              ?_assertEqual([before_all], get(before_all_handling_spec)),
+              ?_assertMatch({error,{throw,something_went_wrong, _}}, proplists:get_value("should do stuff", State))
         end),
 
         it("should not break tests in an outer context if a before all fails", fun() ->
@@ -55,16 +55,16 @@ spec() ->
   describe("before each filter errors", fun() ->
         it("should treat the test as failed if a before each fails", fun() ->
               State = espec:run_spec(before_each_handling_spec, before_each_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [before_each] = get(before_each_handling_spec),
-              {error, {throw, something_went_wrong, _}} =  proplists:get_value("should do stuff", State)
+              ?_assertEqual([before_each], get(before_each_handling_spec)),
+              ?_assertMatch({error, {throw, something_went_wrong, _}}, proplists:get_value("should do stuff", State))
         end)
   end),
 
   describe("after each filter errors", fun() ->
         it("should treat the test as failed if an after each fails", fun() ->
               State = espec:run_spec(after_each_handling_spec, after_each_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [should_do_stuff, after_each] = get(after_each_handling_spec),
-              {error, {throw, something_went_wrong, _}} = proplists:get_value("should do stuff", State)
+              ?_assertEqual([should_do_stuff, after_each], get(after_each_handling_spec)),
+              ?_assertMatch({error, {throw, something_went_wrong, _}}, proplists:get_value("should do stuff", State))
         end)
   end).
 

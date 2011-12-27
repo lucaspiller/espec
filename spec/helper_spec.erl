@@ -12,7 +12,7 @@ spec() ->
 
                   it("should raise an exception when not matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_equal_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        {error, {error, {
+                        ?_assertMatch({error, {error, {
                               assertEqual_failed,
                               [
                                 {line, _},
@@ -20,7 +20,7 @@ spec() ->
                                 {expected, true},
                                 {got, false}
                               ]
-                            }, _}} = proplists:get_value("should fail", State)
+                            }, _}}, proplists:get_value("should fail", State))
                     end)
               end),
 
@@ -32,7 +32,7 @@ spec() ->
 
                   it("should raise an exception when not matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_match_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        {error, {error, {
+                        ?_assertMatch({error, {error, {
                               assertMatch_failed,
                               [
                                 {line, _},
@@ -40,7 +40,7 @@ spec() ->
                                 {expected, "[ a , _ ]"},
                                 {got, [a, b, c]}
                               ]
-                            }, _}} = proplists:get_value("should fail", State)
+                            }, _}}, proplists:get_value("should fail", State))
                     end)
               end)
         end)
