@@ -79,6 +79,44 @@ The filters you can use are:
 * `before_all` - Run before all examples
 * `after_all` - Run after all examples
 
+## Assertions
+
+We also support assertions, you can use them as follows:
+
+    it("should treat the test as succeeded", fun() ->
+          State = espec:run_spec(after_each_handling_spec, after_each_handling_spec(), espec_null_listener:new(), espec_null_listener),
+          ?assertEqual([should_do_stuff, after_each], get(after_each_handling_spec)),
+          ?assertMatch({error, {throw, something_went_wwwwrong, _}}, proplists:get_value("should do stuff", State))
+    end)
+
+Rather than printing out a badmatch error when something goes wrong, we should you the expression, what was expected and the result:
+
+    error handling spec
+      after each filter errors
+        should treat the test as failed if an after each fails (FAILED):
+          assertMatch (line 67) failed
+          Expression:
+              proplists : get_value ( "should do stuff" , State )
+          Expected To Match:
+              { error , { throw , something_went_wwwwrong , _ } }
+          Got:
+              {error,
+                  {throw,something_went_wrong,
+                      [{error_handling_spec,
+                           '-after_each_handling_spec/0-fun-1-',0},
+                       {espec,execute_test,1},
+                       {espec,run_execution_tree,5},
+                       {espec,run_spec,4},
+                       {error_handling_spec,'-spec/0-fun-21-',0},
+                       {espec,execute_test,1},
+                       {espec,run_execution_tree,5},
+                       {espec,run_spec,4}]}}
+
+The supported assertions are as follows. These are compatible with those in EUnit.
+
+* `?assertEqual(Expected, Expression)` - Ensure that `Expression` is equal to `Expected`.
+* `?assertMatch(Guard, Expression)` - Ensure that `Expression` matches `Guard`.
+
 ## the `espec` command
 
 The `espec` executable runs spec files and provides pretty output from the test results. You can pass it files or directories through which it will recursively look for spec files.
