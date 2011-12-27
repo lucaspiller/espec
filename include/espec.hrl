@@ -4,6 +4,7 @@
 -export([
     spec/0
   ]).
+-import(espec_helper, [pending/1]).
 
 -define(assertEqual(Expected, Expr),
   ((fun (__Expected) ->

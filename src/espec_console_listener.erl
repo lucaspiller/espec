@@ -22,6 +22,9 @@ end_example(Description, Result, #state{indentation = Indentation} = State) ->
   case Result of 
     ok ->
       io:format(user, "~s~s~s~s\n", [success_color(State), indentation(Indentation + 1), Description, no_color(State)]);
+    {pending, PendingDescription} ->
+
+      io:format(user, "~s~s~s (PENDING: ~s)~s\n", [pending_color(State), indentation(Indentation + 1), Description, PendingDescription, no_color(State)]);
     {error, {Class, Reason, Stacktrace}} ->
       io:format(user, "~s~s~s (FAILED):\n", [failure_color(State), indentation(Indentation + 1), Description]),
       print_error(Class, Reason, Stacktrace, Indentation),
@@ -44,7 +47,7 @@ print_error(Class, Reason, Stacktrace, Indentation) ->
   io:format(user, "~s~p", [indentation(Indentation + 2), Stacktrace]).
 
 pending_example(Description, #state{indentation = Indentation} = State) ->
-  io:format(user, "~s~s~s (PENDING)~s\n", [pending_color(State), indentation(Indentation + 1), Description, no_color(State)]),
+  io:format(user, "~s~s~s (PENDING: Not Yet Implemented)~s\n", [pending_color(State), indentation(Indentation + 1), Description, no_color(State)]),
   State.
 
 start_group(GroupDescription, #state{indentation = Indentation} = State) ->

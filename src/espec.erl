@@ -87,6 +87,8 @@ execute_test(Fun) ->
         Fun(),
         ok
     catch
+        throw:{pending, Description} ->
+            {pending, Description};
         Class:Reason ->
             {error, {Class, Reason, erlang:get_stacktrace()}}
     end.
