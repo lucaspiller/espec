@@ -36,7 +36,8 @@ run_spec(Mod, Spec) ->
 run_spec(Mod, Spec, ListenerState0, ListenerModule) ->
     ExecutionTree = espec_ast:convert_to_execution_tree(Spec),
     ListenerState1 = ListenerModule:start_spec(Mod, ListenerState0),
-    ListenerState2 = run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok, 0),
+    pristine_context(),
+    ListenerState2 = run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, ok, 0, [[]]),
     ListenerModule:end_spec(Mod, ListenerState2).
 
 pop_error_stack(Result0, FailTestDepth0) ->
@@ -52,35 +53,40 @@ push_error_stack(Result0, FailTestDepth0) ->
        _ -> FailTestDepth0 + 1
     end.
 
-run_execution_tree([], ListenerState0, _, _, _) ->
+run_execution_tree([], ListenerState0, _, _, _, _) ->
     ListenerState0;
-run_execution_tree([{start_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0) ->
+run_execution_tree([{start_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0, ContextStack0) ->
+    NewContext = save_context(),
     ListenerState1 = ListenerModule:start_group(GroupDescription, ListenerState0),
     FailTestDepth = push_error_stack(Result, FailTestDepth0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
-run_execution_tree([{end_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0) ->
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth,
+      [NewContext | ContextStack0]);
+run_execution_tree([{end_group, _Line, GroupDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0, [ContextHead|ContextTail]) ->
+    restore_context(ContextHead),
     ListenerState1 = ListenerModule:end_group(GroupDescription, ListenerState0),
     {Result, FailTestDepth} = pop_error_stack(Result0, FailTestDepth0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, ContextTail);
 
-run_execution_tree([{pending_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth) ->
+run_execution_tree([{pending_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth, ContextStack) ->
     ListenerState1 = ListenerModule:pending_example(ExampleDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
-run_execution_tree([{start_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0) ->
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, ContextStack);
+run_execution_tree([{start_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0, ContextStack0) ->
+    NewContext = save_context(),
     FailTestDepth = push_error_stack(Result, FailTestDepth0),
     ListenerState1 = ListenerModule:start_example(ExampleDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
-run_execution_tree([{end_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0) ->
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, [NewContext | ContextStack0]);
+run_execution_tree([{end_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result0, FailTestDepth0, [ContextHead|ContextRest]) ->
+    restore_context(ContextHead), 
     ListenerState1 = ListenerModule:end_example(ExampleDescription, Result0, ListenerState0),
     {Result, FailTestDepth} = pop_error_stack(Result0, FailTestDepth0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth);
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, ContextRest);
 
-run_execution_tree([{run, Fun} | ExecutionTree], ListenerState0, ListenerModule, ok, 0 = FailTestDepth) ->
+run_execution_tree([{run, Fun} | ExecutionTree], ListenerState0, ListenerModule, ok, 0 = FailTestDepth, ContextStack) ->
     Result = execute_test(Fun),
-    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Result, FailTestDepth);
-run_execution_tree([{run, _} | ExecutionTree], ListenerState0, ListenerModule, Error, FailTestDepth) ->
+    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Result, FailTestDepth, ContextStack);
+run_execution_tree([{run, _} | ExecutionTree], ListenerState0, ListenerModule, Error, FailTestDepth, ContextStack) ->
     % Don't run a fun if there are existing errors
-    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Error, FailTestDepth).
+    run_execution_tree(ExecutionTree, ListenerState0, ListenerModule, Error, FailTestDepth, ContextStack).
 
 execute_test(Fun) ->
     try
@@ -124,3 +130,13 @@ filter_by_line(Line, EndLine, Body) ->
         false ->
             lists:map(fun({Part, _EndLine}) -> Part end, PartsWithEndLines)
      end.
+
+pristine_context() ->
+  put(espec_context, dict:new()).
+
+save_context() ->
+  get(espec_context).
+
+restore_context(Context) ->
+  put(espec_context, Context).
+
