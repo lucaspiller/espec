@@ -5,7 +5,7 @@
     spec/0
   ]).
 
--define(_assertEqual(Expected, Expr),
+-define(assertEqual(Expected, Expr),
   ((fun (__Expected) ->
           case (Expr) of
             __Expected ->
@@ -21,7 +21,7 @@
         end
     end)(Expected))).
 
--define(_assertMatch(Guard, Expr),
+-define(assertMatch(Guard, Expr),
   ((fun () ->
           case (Expr) of
             Guard ->

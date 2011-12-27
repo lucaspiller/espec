@@ -10,7 +10,7 @@ spec() ->
                     {example, 2, "example1", Fun}
                   ]}
               ],
-              ?_assertEqual([
+              ?assertEqual([
                 {start_group, 1, "example spec"},
                 {start_example, 2, "example1"},
                 {run, Fun},
@@ -25,7 +25,7 @@ spec() ->
                     {pending, 2, "example1"}
                   ]}
               ],
-              ?_assertEqual([
+              ?assertEqual([
                 {start_group, 1, "example spec"},
                 {pending_example, 2, "example1"},
                 {end_group, 1, "example spec"}
@@ -41,7 +41,7 @@ spec() ->
                     {example, 3, "example2", Fun2}
                   ]}
               ],
-              ?_assertEqual([
+              ?assertEqual([
                 {start_group, 1, "example spec"},
                 {start_example, 2, "example1"},
                 {run, Fun1},
@@ -65,7 +65,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  ?_assertEqual([
+                  ?assertEqual([
                     {start_group, 1, "example spec"},
                     {start_example, 3, "example1"},
                     {run, Filter1},
@@ -87,7 +87,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  ?_assertEqual([
+                  ?assertEqual([
                     {start_group, 1, "example spec"},
                     {run, Filter1},
                     {run, Filter2},
@@ -109,7 +109,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 3, "example1"},
                       {run, Fun1},
@@ -132,7 +132,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  ?_assertEqual([
+                  ?assertEqual([
                     {start_group, 1, "example spec"},
                     {start_example, 3, "example1"},
                     {run, Fun1},
@@ -154,7 +154,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Filter},
@@ -179,7 +179,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},
@@ -206,7 +206,7 @@ spec() ->
                           ]}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Filter},
@@ -235,7 +235,7 @@ spec() ->
                           ]}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},
@@ -262,7 +262,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {run, Filter},
                       {start_example, 2, "example1"},
@@ -286,7 +286,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    ?_assertEqual([
+                    ?assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},

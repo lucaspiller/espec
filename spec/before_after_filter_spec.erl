@@ -5,59 +5,59 @@ spec() ->
   describe("before each filters", fun() ->
         it("should run once when there is one example", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example1_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, example1], get(before_each1))
+              ?assertEqual([ran_before_each, example1], get(before_each1))
           end),
 
         it("should run twice when there are two examples", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example2_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, example1, ran_before_each, example2], get(before_each2))
+              ?assertEqual([ran_before_each, example1, ran_before_each, example2], get(before_each2))
           end),
 
         it("should run before examples in current group and nested groups", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example3_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example], get(before_each3))
+              ?assertEqual([ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example], get(before_each3))
           end),
 
         it("should run 'outer before' before each example in the nested group", fun() ->
               espec:run_spec(before_each_example_spec, before_each_example4_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example, ran_before_each, ran_before_each_nested, nested_example2], get(before_each4))
+              ?assertEqual([ran_before_each, example, ran_before_each, ran_before_each_nested, nested_example, ran_before_each, ran_before_each_nested, nested_example2], get(before_each4))
           end),
 
         it("should run multiple before each filters", fun() ->
               espec:run_spec(before_each_multiple_before_filter_spec, before_each_multiple_before_filter_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, ran_before_each2, example], get(before_each_multiple_before_filter))
+              ?assertEqual([ran_before_each, ran_before_each2, example], get(before_each_multiple_before_filter))
         end),
 
         it("should run 'outer outer before' and 'outer before' before each example in the doubly nested group", fun() ->
               espec:run_spec(before_each_double_nested_filter_spec, before_each_double_nested_filter_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_each, ran_before_each2, ran_before_each3, example, ran_before_each, ran_before_each2, ran_before_each3, example2], get(before_each_double_nested_filter))
+              ?assertEqual([ran_before_each, ran_before_each2, ran_before_each3, example, ran_before_each, ran_before_each2, ran_before_each3, example2], get(before_each_double_nested_filter))
         end)
     end),
 
   describe("after each filters", fun() ->
         it("should run once when there is one example", fun() ->
               espec:run_spec(after_each_example_spec, after_each_example1_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example1, ran_after_each], get(after_each1))
+              ?assertEqual([example1, ran_after_each], get(after_each1))
           end),
 
         it("should run twice when there are two examples", fun() ->
               espec:run_spec(after_each_example_spec, after_each_example2_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example1, ran_after_each, example2, ran_after_each], get(after_each2))
+              ?assertEqual([example1, ran_after_each, example2, ran_after_each], get(after_each2))
           end),
 
         it("should run after examples in current group and nested groups", fun() ->
               espec:run_spec(after_each_example_spec, after_each_example3_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example, ran_after_each, nested_example, ran_after_each_nested, ran_after_each], get(after_each3))
+              ?assertEqual([example, ran_after_each, nested_example, ran_after_each_nested, ran_after_each], get(after_each3))
           end),
 
         it("should run multiple after each filters", fun() ->
               espec:run_spec(after_each_multiple_after_filter_spec, after_each_multiple_after_filter_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example, ran_after_each2, ran_after_each], get(after_each_multiple_after_filter))
+              ?assertEqual([example, ran_after_each2, ran_after_each], get(after_each_multiple_after_filter))
         end),
 
         it("should run 'outer after' after each example in the nested group", fun() ->
               espec:run_spec(after_each_nested_spec, after_each_nested_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example,  ran_after_each2, ran_after_each,
+              ?assertEqual([example,  ran_after_each2, ran_after_each,
                nested_example, ran_after_each_nested, ran_after_each2, ran_after_each, 
                nested_example2,  ran_after_each_nested, ran_after_each2, ran_after_each], get(after_each_nested))
         end)
@@ -66,44 +66,44 @@ spec() ->
   describe("before all filters", fun() ->
         it("should run once when there is one example", fun() ->
               espec:run_spec(before_all_example_spec, before_all_example1_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_all, example1], get(before_all1))
+              ?assertEqual([ran_before_all, example1], get(before_all1))
           end),
 
         it("should run once when there are two examples", fun() ->
               espec:run_spec(before_all_example_spec, before_all_example2_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_all, example1, example2], get(before_all2))
+              ?assertEqual([ran_before_all, example1, example2], get(before_all2))
           end),
 
         it("should run before all once before all examples in the current group and nested groups", fun() ->
               espec:run_spec(before_all_example_spec, before_all_example3_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_all, example, ran_before_all_nested, nested_example], get(before_all3))
+              ?assertEqual([ran_before_all, example, ran_before_all_nested, nested_example], get(before_all3))
           end),
 
         it("should run multiple before all filters", fun() ->
               espec:run_spec(before_all_multiple_before_filter_spec, before_all_multiple_before_filter_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([ran_before_all, ran_before_all2, example], get(before_all_multiple_before_filter))
+              ?assertEqual([ran_before_all, ran_before_all2, example], get(before_all_multiple_before_filter))
         end)
     end),
 
   describe("after all filters", fun() ->
         it("should run once when there is one example", fun() ->
               espec:run_spec(after_all_example_spec, after_all_example1_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example1, ran_after_all], get(after_all1))
+              ?assertEqual([example1, ran_after_all], get(after_all1))
           end),
 
         it("should run once when there are two examples", fun() ->
               espec:run_spec(after_all_example_spec, after_all_example2_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example1, example2, ran_after_all], get(after_all2))
+              ?assertEqual([example1, example2, ran_after_all], get(after_all2))
           end),
 
         it("should run after all once after all examples in the current group and nested groups", fun() ->
               espec:run_spec(after_all_example_spec, after_all_example_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example, nested_example, ran_after_all_nested, ran_after_all], get(after_all3))
+              ?assertEqual([example, nested_example, ran_after_all_nested, ran_after_all], get(after_all3))
           end),
 
         it("should run multiple after all filters", fun() ->
               espec:run_spec(after_all_multiple_after_filter_spec, after_all_multiple_after_filter_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual([example, ran_after_all2, ran_after_all], get(after_all_multiple_after_filter))
+              ?assertEqual([example, ran_after_all2, ran_after_all], get(after_all_multiple_after_filter))
         end)
     end).
 

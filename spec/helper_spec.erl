@@ -7,12 +7,12 @@ spec() ->
             describe("assert equal", fun() ->
                   it("should not raise an exception when matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_equal_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        ?_assertEqual(ok, proplists:get_value("should return ok", State))
+                        ?assertEqual(ok, proplists:get_value("should return ok", State))
                     end),
 
                   it("should raise an exception when not matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_equal_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        ?_assertMatch({error, {error, {
+                        ?assertMatch({error, {error, {
                               assertEqual_failed,
                               [
                                 {line, _},
@@ -27,12 +27,12 @@ spec() ->
             describe("assert match", fun() ->
                   it("should not raise an exception when matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_match_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        ?_assertEqual(ok, proplists:get_value("should return ok", State))
+                        ?assertEqual(ok, proplists:get_value("should return ok", State))
                     end),
 
                   it("should raise an exception when not matching", fun() ->
                         State = espec:run_spec(error_example_spec, assert_match_example_spec(), espec_null_listener:new(), espec_null_listener),
-                        ?_assertMatch({error, {error, {
+                        ?assertMatch({error, {error, {
                               assertMatch_failed,
                               [
                                 {line, _},
@@ -51,13 +51,13 @@ assert_equal_example_spec() ->
       it("should return ok", fun() ->
             A = true,
             B = true,
-            ?_assertEqual(A, B)
+            ?assertEqual(A, B)
       end),
 
       it("should fail", fun() ->
             A = true,
             B = false,
-            ?_assertEqual(A, B)
+            ?assertEqual(A, B)
       end)
   end).
 
@@ -65,11 +65,11 @@ assert_match_example_spec() ->
   describe("assert match spec", fun() ->
       it("should return ok", fun() ->
             List = [a, b, c],
-            ?_assertMatch([a, _, c], List)
+            ?assertMatch([a, _, c], List)
       end),
 
       it("should fail", fun() ->
             List = [a, b, c],
-            ?_assertMatch([a, _], List)
+            ?assertMatch([a, _], List)
       end)
   end).

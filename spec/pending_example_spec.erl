@@ -5,7 +5,7 @@ spec() ->
   describe("pending examples", fun() ->
         it("should be recorded", fun() ->
               State = espec:run_spec(pending_example_spec, pending_example_spec(), espec_null_listener:new(), espec_null_listener),
-              ?_assertEqual(pending, proplists:get_value("should do stuff", State))
+              ?assertEqual(pending, proplists:get_value("should do stuff", State))
           end)
     end).
 
