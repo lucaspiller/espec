@@ -50,17 +50,17 @@ spec() ->
         before_each(fun() ->
             put(line_number_spec, undefined)
         end),
-        
+
         it("should run a single example if the line is inside that example", fun() ->
               espec:run_spec(line_number_spec, espec:filter_groups_by_line(?SHOULD_DO_SECOND_STUFF, line_number_spec()),
                                      espec_null_listener:new(), espec_null_listener),
-              [before_each, it_should_do_second_stuff] = get(line_number_spec)
+              ?_assertEqual([before_each, it_should_do_second_stuff], get(line_number_spec))
         end),
-       
+
         it("should run a single example in a nested describe block", fun() ->
               espec:run_spec(line_number_spec, espec:filter_groups_by_line(?SHOULD_DO_FIRST_NESTED_STUFF, line_number_spec()),
                                                     espec_null_listener:new(), espec_null_listener),
-              [before_each, before_each_nested, it_should_do_first_nested] = get(line_number_spec)
+              ?_assertEqual([before_each, before_each_nested, it_should_do_first_nested], get(line_number_spec))
         end),
 
         it("should run everything in describe block if line is inside but not in an example", fun() ->
@@ -69,16 +69,13 @@ spec() ->
               %% the next block :(
               espec:run_spec(line_number_spec, espec:filter_groups_by_line(?OUTER_DESCRIBE_BLOCK, line_number_spec()),
                                      espec_null_listener:new(), espec_null_listener),
-              [before_each, it_should_do_first_stuff, before_each, it_should_do_second_stuff, 
-                before_each, before_each_nested, it_should_do_first_nested] = get(line_number_spec)
+              ?_assertEqual([before_each, it_should_do_first_stuff, before_each, it_should_do_second_stuff,
+                  before_each, before_each_nested, it_should_do_first_nested], get(line_number_spec))
         end),
 
         it("should run everything in a nested describe block if line is inside but not in an example", fun() ->
               espec:run_spec(line_number_spec, espec:filter_groups_by_line(?INNER_DESCRIBE_BLOCK, line_number_spec()),
                                      espec_null_listener:new(), espec_null_listener),
-              [before_each, before_each_nested, it_should_do_first_nested] = get(line_number_spec)
+              ?_assertEqual([before_each, before_each_nested, it_should_do_first_nested], get(line_number_spec))
         end)
-        
     end).
-
-

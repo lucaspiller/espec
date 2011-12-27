@@ -39,14 +39,14 @@ spec() ->
 
         it("should not break tests in an outer context if a before all fails", fun() ->
               _State = espec:run_spec(before_all_nested_handling_spec, before_all_nested_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [example1, before_all, example2] = get(before_all_nested_handling_spec)
+              ?_assertEqual([example1, before_all, example2], get(before_all_nested_handling_spec))
         end)
   end),
 
   describe("after all filter errors", fun() ->
         it("should treat the test as succeeded", fun() ->
               _State = espec:run_spec(after_all_handling_spec, after_all_handling_spec(), espec_null_listener:new(), espec_null_listener),
-              [should_do_stuff, after_all] = get(after_all_handling_spec)
+              ?_assertEqual([should_do_stuff, after_all], get(after_all_handling_spec))
         end),
 
         it("should flag the after all as failing")

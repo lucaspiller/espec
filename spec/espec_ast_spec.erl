@@ -10,13 +10,13 @@ spec() ->
                     {example, 2, "example1", Fun}
                   ]}
               ],
-              [
+              ?_assertEqual([
                 {start_group, 1, "example spec"},
                 {start_example, 2, "example1"},
                 {run, Fun},
                 {end_example, 2, "example1"},
                 {end_group, 1, "example spec"}
-              ] = espec_ast:convert_to_execution_tree(AST)
+              ], espec_ast:convert_to_execution_tree(AST))
           end),
 
         it("should return pending example in execution tree format", fun() ->
@@ -25,11 +25,11 @@ spec() ->
                     {pending, 2, "example1"}
                   ]}
               ],
-              [
+              ?_assertEqual([
                 {start_group, 1, "example spec"},
                 {pending_example, 2, "example1"},
                 {end_group, 1, "example spec"}
-              ] = espec_ast:convert_to_execution_tree(AST)
+              ], espec_ast:convert_to_execution_tree(AST))
           end),
 
         it("should return multiple examples in execution tree format", fun() ->
@@ -41,7 +41,7 @@ spec() ->
                     {example, 3, "example2", Fun2}
                   ]}
               ],
-              [
+              ?_assertEqual([
                 {start_group, 1, "example spec"},
                 {start_example, 2, "example1"},
                 {run, Fun1},
@@ -50,7 +50,7 @@ spec() ->
                 {run, Fun2},
                 {end_example, 3, "example2"},
                 {end_group, 1, "example spec"}
-              ] = espec_ast:convert_to_execution_tree(AST)
+              ], espec_ast:convert_to_execution_tree(AST))
           end),
 
         describe("filters", fun() ->
@@ -65,7 +65,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  [
+                  ?_assertEqual([
                     {start_group, 1, "example spec"},
                     {start_example, 3, "example1"},
                     {run, Filter1},
@@ -73,7 +73,7 @@ spec() ->
                     {run, Fun1},
                     {end_example, 3, "example1"},
                     {end_group, 1, "example spec"}
-                  ] = espec_ast:convert_to_execution_tree(AST)
+                  ], espec_ast:convert_to_execution_tree(AST))
               end),
 
               it("should handle multiple before all filters", fun() ->
@@ -87,7 +87,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  [
+                  ?_assertEqual([
                     {start_group, 1, "example spec"},
                     {run, Filter1},
                     {run, Filter2},
@@ -95,7 +95,7 @@ spec() ->
                     {run, Fun1},
                     {end_example, 3, "example1"},
                     {end_group, 1, "example spec"}
-                  ] = espec_ast:convert_to_execution_tree(AST)
+                  ], espec_ast:convert_to_execution_tree(AST))
               end),
 
               it("should handle multiple after all filters", fun() ->
@@ -109,7 +109,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 3, "example1"},
                       {run, Fun1},
@@ -117,7 +117,7 @@ spec() ->
                       {run, Filter2},
                       {run, Filter1},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
               end),
 
 
@@ -132,7 +132,7 @@ spec() ->
                           {example, 3, "example1", Fun1}
                       ]}
                   ],
-                  [
+                  ?_assertEqual([
                     {start_group, 1, "example spec"},
                     {start_example, 3, "example1"},
                     {run, Fun1},
@@ -140,7 +140,7 @@ spec() ->
                     {run, Filter1},
                     {end_example, 3, "example1"},
                     {end_group, 1, "example spec"}
-                  ] = espec_ast:convert_to_execution_tree(AST)
+                  ], espec_ast:convert_to_execution_tree(AST))
               end),
 
               it("should return before each filters in execution tree format", fun() ->
@@ -154,7 +154,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Filter},
@@ -165,7 +165,7 @@ spec() ->
                       {run, Fun2},
                       {end_example, 3, "example2"},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end),
 
               it("should return after each filters in execution tree format", fun() ->
@@ -179,7 +179,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},
@@ -190,7 +190,7 @@ spec() ->
                       {run, Filter},
                       {end_example, 3, "example2"},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end),
 
               it("should return before each filters with nested examples in execution tree format", fun() ->
@@ -206,7 +206,7 @@ spec() ->
                           ]}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Filter},
@@ -219,7 +219,7 @@ spec() ->
                       {end_example, 4, "example2"},
                       {end_group, 3, "nested example spec"},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end),
 
               it("should return after each filters with nested examples in execution tree format", fun() ->
@@ -235,7 +235,7 @@ spec() ->
                           ]}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},
@@ -248,7 +248,7 @@ spec() ->
                       {end_example, 4, "example2"},
                       {end_group, 3, "nested example spec"},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end),
 
               it("should return before all filters in execution tree format", fun() ->
@@ -262,7 +262,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {run, Filter},
                       {start_example, 2, "example1"},
@@ -272,7 +272,7 @@ spec() ->
                       {run, Fun2},
                       {end_example, 3, "example2"},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end),
 
               it("should return after all filters in execution tree format", fun() ->
@@ -286,7 +286,7 @@ spec() ->
                           {example, 3, "example2", Fun2}
                         ]}
                     ],
-                    [
+                    ?_assertEqual([
                       {start_group, 1, "example spec"},
                       {start_example, 2, "example1"},
                       {run, Fun1},
@@ -296,7 +296,7 @@ spec() ->
                       {end_example, 3, "example2"},
                       {run, Filter},
                       {end_group, 1, "example spec"}
-                    ] = espec_ast:convert_to_execution_tree(AST)
+                    ], espec_ast:convert_to_execution_tree(AST))
                 end)
           end)
     end).
