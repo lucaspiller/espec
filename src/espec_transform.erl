@@ -60,11 +60,16 @@ walk_spec_body(Body) ->
   List = lists:map(fun walk_spec_statement/1, Body),
   erl_syntax:list(List).
 
-walk_spec_statement({call, LineNo, {atom, _LineNo2, it}, [{string, _LineNo3, Description}]}) ->
-  erl_syntax:tuple([erl_syntax:atom(pending), erl_syntax:integer(LineNo), erl_syntax:string(Description)]);
+walk_spec_statement({call, LineNo, {atom, _LineNo2, Example}, [{string, _LineNo3, Description}]}) when Example =:= it orelse Example =:= pending->
+  make_pending(LineNo, Description);
 
-walk_spec_statement({call, LineNo, {atom, _LineNo2, it}, [{string, _LineNo3, Description}, {'fun', _LineNo4, _Clauses} = Fun]}) ->
-  erl_syntax:tuple([erl_syntax:atom(example), erl_syntax:integer(LineNo), erl_syntax:string(Description), Fun]);
+walk_spec_statement({call, LineNo, {atom, _LineNo2, Example}, [{string, _LineNo3, Description}, {'fun', _LineNo4, _Clauses} = Fun]}) when Example =:= it orelse Example =:= pending ->
+  case Example of
+    it -> 
+      erl_syntax:tuple([erl_syntax:atom(example), erl_syntax:integer(LineNo), erl_syntax:string(Description), Fun]);
+    pending ->
+      make_pending(LineNo, Description)
+  end;
 
 walk_spec_statement({call, LineNo, {atom, _LineNo2, before_each}, [{'fun', _LineNo4, _Clauses} = Fun]}) ->
   erl_syntax:tuple([erl_syntax:atom(before_), erl_syntax:integer(LineNo), erl_syntax:atom(each), Fun]);
@@ -82,3 +87,5 @@ walk_spec_statement({call, LineNo, {atom, _LineNo2, describe}, [{string, _LineNo
   Body = walk_single_clause(Clauses),
   erl_syntax:tuple([erl_syntax:atom(group), erl_syntax:integer(LineNo), erl_syntax:string(Description), Body]).
 
+make_pending(LineNo, Description) ->
+  erl_syntax:tuple([erl_syntax:atom(pending), erl_syntax:integer(LineNo), erl_syntax:string(Description)]).
