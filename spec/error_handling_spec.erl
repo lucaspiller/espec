@@ -66,7 +66,20 @@ spec() ->
               [should_do_stuff, after_each] = get(after_each_handling_spec),
               {error, {throw, something_went_wrong, _}} = proplists:get_value("should do stuff", State)
         end)
+  end),
+
+  describe("eunit assertions", fun() ->
+        it("should give a nice error message when failing", fun() ->
+              State =  espec:run_spec(eunit_assertion_spec, eunit_assertion_spec(), espec_null_listener:new(), espec_null_listener),
+              {error, {_Class, Reason, _StackTrace}} = proplists:get_value("should do stuff", State),
+              {assertEqual_failed,[{module,error_handling_spec},
+                                   {line,_},
+                                   {expression,"bar"},
+                                   {expected,foo},
+                                   {value,bar}]} = Reason
+        end)
   end).
+
 
 %
 % Example specs hould be caught and returnedor testing
@@ -144,6 +157,13 @@ before_all_nested_handling_spec() ->
   end).
 
 
+
+eunit_assertion_spec() ->
+  describe("eunit assertions", fun() ->
+    it("should do stuff", fun() ->
+      ?assertEqual(foo, bar)
+    end)
+  end).
 
 after_all_handling_spec() ->
   describe("after all handling", fun() ->
