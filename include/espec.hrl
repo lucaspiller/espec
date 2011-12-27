@@ -20,3 +20,19 @@
                   ]})
         end
     end)(Expected))).
+
+-define(_assertMatch(Guard, Expr),
+  ((fun () ->
+          case (Expr) of
+            Guard ->
+              ok;
+            __Value ->
+              erlang:error({assertMatch_failed,
+                  [
+                      {line, ?LINE},
+                      {expression, (??Expr)},
+                      {expected, (??Guard)},
+                      {got, __Value}
+                  ]})
+        end
+    end)())).
