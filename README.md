@@ -117,6 +117,30 @@ The supported assertions are as follows. These are compatible with those in EUni
 * `?assertEqual(Expected, Expression)` - Ensure that `Expression` is equal to `Expected`.
 * `?assertMatch(Guard, Expression)` - Ensure that `Expression` matches `Guard`.
 
+## Configuration Variables
+
+Espec supports configuration variables like rspec instance variables. These are meant to be set during the before filters 
+and accessed in the examples or in the after filters. The syntax is:
+
+    describe("instance variables", fun() ->
+      before_each(fun() ->
+        spec_set(var1, "variable 1")
+      end),
+
+      it("should do stuff", fun() ->
+        do_stuff(spec_get(var1))
+      end),
+
+      after_each(fun() ->
+        do_more_stuff(spec_get(var1))
+      end)
+    end).
+
+If you modify an instance variable in an example the effects won't be seen in other examples. If you modify
+an instance variable in a nested group the effects won't be seen in the outer scope. 'Before all' methods run before
+all 'before each' methods so they can't see the effects of 'before each' methods. 'After all' methods will only be able
+to see the effects of 'before all' methods and won't see effects from examples, 'before each' methods, or 'after each' methods.
+
 ## the `espec` command
 
 The `espec` executable runs spec files and provides pretty output from the test results. You can pass it files or directories through which it will recursively look for spec files.
