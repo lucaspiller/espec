@@ -19,7 +19,8 @@ run(Mods) when is_list(Mods) ->
           run(Mod)
       end, Mods),
     FinalStats = get(stats),
-    io:format("Stats run ~w succeede ~w failed ~w ~n", [FinalStats#spec_stats.run, FinalStats#spec_stats.succeeded, FinalStats#spec_stats.failed]);
+    io:format("~n~n"),
+    io:format("Stats: run ~w examples. \e[0;32mSucceeded ~w \e[0;31mFailed ~w ~n\e[m", [FinalStats#spec_stats.run, FinalStats#spec_stats.succeeded, FinalStats#spec_stats.failed]);
 
 run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
