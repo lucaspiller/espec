@@ -11,7 +11,8 @@
 -record(spec_stats,{
     run = 0,
     failed = 0,
-    succeeded = 0
+    succeeded = 0,
+    pending = 0
   }).
 
 run(Mods) when is_list(Mods) ->
@@ -20,7 +21,7 @@ run(Mods) when is_list(Mods) ->
       end, Mods),
     FinalStats = get(stats),
     io:format("~n~n"),
-    io:format("Stats: run ~w examples. \e[0;32mSucceeded ~w \e[0;31mFailed ~w ~n\e[m", [FinalStats#spec_stats.run, FinalStats#spec_stats.succeeded, FinalStats#spec_stats.failed]);
+    io:format("Stats: run ~w examples. \e[0;32mSucceeded ~w \e[0;31mFailed ~w \e[0;33mPending  ~w ~n\e[m", [FinalStats#spec_stats.run, FinalStats#spec_stats.succeeded, FinalStats#spec_stats.failed, FinalStats#spec_stats.pending]);
 
 run(Mod) when is_atom(Mod) ->
     Spec = Mod:spec(),
@@ -79,7 +80,11 @@ run_execution_tree([{end_group, _Line, GroupDescription} | ExecutionTree], Liste
 
 run_execution_tree([{pending_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth, ContextStack, SpecStats) ->
     ListenerState1 = ListenerModule:pending_example(ExampleDescription, ListenerState0),
-    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, ContextStack, SpecStats);
+    Stats0 = SpecStats#spec_stats{
+      run = SpecStats#spec_stats.run + 1,
+      pending = SpecStats#spec_stats.pending + 1
+    },
+    run_execution_tree(ExecutionTree, ListenerState1, ListenerModule, Result, FailTestDepth, ContextStack, Stats0);
 run_execution_tree([{start_example, _Line, ExampleDescription} | ExecutionTree], ListenerState0, ListenerModule, Result, FailTestDepth0, ContextStack0, SpecStats) ->
     NewContext = save_context(),
     FailTestDepth = push_error_stack(Result, FailTestDepth0),
