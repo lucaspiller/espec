@@ -1,5 +1,7 @@
 # ESpec
 
+[![Build Status](https://travis-ci.org/lucaspiller/espec.png)](https://travis-ci.org/lucaspiller/espec)
+
 Behaviour driven development for Erlang.
 
 ## Overview

@@ -1,0 +1,4 @@
+language: erlang
+otp_release:
+  - R15B03
+script: make spec
