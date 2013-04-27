@@ -53,4 +53,11 @@ run_spec_files(SpecFiles) ->
     %% TODO add a command line option to allow custom load paths
     code:add_patha("ebin"),
 
+    case file:list_dir("deps") of
+        {ok, Filenames} ->
+            lists:foreach(fun(Name) -> code:add_patha("deps/" ++ Name ++ "/ebin") end, Filenames);
+        _ ->
+            no_deps_dir
+    end,
+
     espec:run(Modules).
