@@ -156,6 +156,8 @@ The `espec` executable runs spec files and provides pretty output from the test 
         should return an error when trying to make a request (FAILED):
           error {badmatch, false}
 
+To build it yourself, clone the repository and run `make generate`. The binary `bin/espec` is completely standalone, so you can use it in other projects just by copying it over.
+
 ## Development
 
 Start an Erlang shell with reloader support:
