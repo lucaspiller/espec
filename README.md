@@ -143,7 +143,7 @@ an instance variable in a nested group the effects won't be seen in the outer sc
 all 'before each' methods so they can't see the effects of 'before each' methods. 'After all' methods will only be able
 to see the effects of 'before all' methods and won't see effects from examples, 'before each' methods, or 'after each' methods.
 
-## the `espec` command
+## The `espec` command
 
 The `espec` executable runs spec files and provides pretty output from the test results. You can pass it files or directories through which it will recursively look for spec files.
 
@@ -155,6 +155,12 @@ The `espec` executable runs spec files and provides pretty output from the test 
       when not connected
         should return an error when trying to make a request (FAILED):
           error {badmatch, false}
+
+## Getting started / Installation
+
+The `espec` executable is self contained. Just copy it into the root of your project, just like you would rebar. You don't need to / can't install ESpec as a rebar dependency.
+
+Create a directory called `spec`, and start creating spec files in there. For an example project using ESpec, take a look at [Twerl](https://github.com/lucaspiller/twerl).
 
 ## Development
 
