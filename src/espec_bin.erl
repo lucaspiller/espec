@@ -6,7 +6,7 @@
 run_spec_files_from_args(Args) ->
     SpecFiles = expand_files_from_args(Args),
     run_spec_files(SpecFiles).
-    
+
 -spec expand_files_from_args(list()) -> list({string(), integer() | all}).
 expand_files_from_args(FilesOrDirs) ->
     lists:flatmap(fun(FileOrDir) ->
@@ -28,7 +28,7 @@ process_file_arg(FileArg) ->
         nomatch ->
             {FileArg, all}
     end.
-       
+
 -spec run_spec_files(list({string(), integer() | all})) -> term().
 run_spec_files(SpecFiles) ->
     CompileOptions = [
@@ -48,4 +48,16 @@ run_spec_files(SpecFiles) ->
                 Acc
         end
     end, [], SpecFiles),
+
+    %% Add ebin to the load path (when running as a standalone binary)
+    %% TODO add a command line option to allow custom load paths
+    code:add_patha("ebin"),
+
+    case file:list_dir("deps") of
+        {ok, Filenames} ->
+            lists:foreach(fun(Name) -> code:add_patha("deps/" ++ Name ++ "/ebin") end, Filenames);
+        _ ->
+            no_deps_dir
+    end,
+
     espec:run(Modules).

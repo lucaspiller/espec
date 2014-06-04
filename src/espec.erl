@@ -1,12 +1,24 @@
 -module(espec).
 
 -export([
+        main/1,
         run/1,
         run/3,
         run_spec/2,
         run_spec/4,
         filter_groups_by_line/2
     ]).
+
+%% main entry point when called as a standalone script with created with `rebar escriptize`
+main([]) ->
+    usage();
+main(Args) ->
+    espec_bin:run_spec_files_from_args(Args).
+
+-spec usage() -> term().
+usage() ->
+    io:format("Usage: espec [files or directories]\n"),
+    halt(1).
 
 run(Mods) when is_list(Mods) ->
     lists:foreach(fun(Mod) ->

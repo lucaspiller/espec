@@ -156,6 +156,8 @@ The `espec` executable runs spec files and provides pretty output from the test 
         should return an error when trying to make a request (FAILED):
           error {badmatch, false}
 
+To build it yourself, clone the repository and run `make generate`. The binary `bin/espec` is self contained, so you can use it in other projects.
+
 ## Getting started / Installation
 
 The `espec` executable is self contained. Just copy it into the root of your project, just like you would rebar. You don't need to / can't install ESpec as a rebar dependency.
