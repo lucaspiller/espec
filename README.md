@@ -181,9 +181,13 @@ Run specs:
 ## Contributing
 
 * Fork the project.
-* Make your feature addition or bug fix.
-* Add specs. Pull requests without tests will be ignored.
-* Send me a pull request. Bonus points for topic branches.
+* Make your feature, addition or bug fix.
+* Add specs.
+* Send me a pull request.
+
+## License
+
+MIT License. See `LICENSE.md` for details.
 
 ## Authors
 
