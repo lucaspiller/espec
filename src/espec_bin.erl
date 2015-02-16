@@ -31,17 +31,9 @@ process_file_arg(FileArg) ->
 
 -spec run_spec_files(list({string(), integer() | all})) -> term().
 run_spec_files(SpecFiles) ->
-    CompileOptions = [
-        binary,
-        {i, "ebin"},
-        {i, "include"},
-        report,
-        warnings_as_errors
-    ],
     Modules = lists:foldl(fun({SpecFile, Line}, Acc) ->
-        case compile:file(SpecFile, CompileOptions) of
-            {ok, Module, Binary} ->
-                {module, Module} = code:load_binary(Module, SpecFile, Binary),
+        case compile_spec_file(SpecFile) of
+            {ok, Module} ->
                 [{Module, Line} | Acc];
             error ->
                 % errors and warnings are automatically printed to stdout
@@ -61,3 +53,50 @@ run_spec_files(SpecFiles) ->
     end,
 
     espec:run(Modules).
+
+-spec espec_macros() -> list(term()).
+espec_macros() ->
+    [
+        {
+            'assertEqual',
+            ['Expected', 'Expression'],
+            "espec_helper:assert_equal(Expected, Expression, ?LINE, (??Expression))",
+            complex
+        },
+        {
+            'assertMatch',
+            ['Guard', 'Expression'],
+            "espec_helper:assert_match(Guard, Expression, ?LINE, (??Expression))",
+            complex
+        }
+    ].
+
+-spec compile_spec_file(string()) -> {ok, term()} | error.
+compile_spec_file(SpecFile) ->
+    ParseOptions = [
+        {includes, ["ebin", "include"]},
+        {macros, espec_macros()}
+    ],
+    CompileOptions = [
+        {parse_transform, espec_transform},
+        nowarn_unused_vars,
+        verbose,
+        report,
+        export_all
+    ],
+    case epp2:parse_file(SpecFile, ParseOptions) of
+        {ok, Forms} ->
+            case compile:forms(Forms, CompileOptions) of
+                {ok, Module, Binary} ->
+                    {module, Module} = code:load_binary(Module, SpecFile, Binary),
+                    {ok, Module};
+                error ->
+                    io:format("Aborted due to compile error!~n"),
+                    %% errors and warnings are automatically printed to stdout
+                    error
+            end;
+        error ->
+            io:format("Aborted due to parse error!~n"),
+            %% errors and warnings are automatically printed to stdout
+            error
+    end.

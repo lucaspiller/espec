@@ -1,5 +1,5 @@
 -module(espec_helper).
--export([spec_get/1, spec_set/2]).
+-export([spec_get/1, spec_set/2, assert_equal/4, assert_match/4]).
 
 spec_get(Atom) ->
   case get(espec_context) of
@@ -27,5 +27,30 @@ spec_set(Atom, Value) ->
       ok
   end.
 
+assert_equal(Expected, Expression, Line, ExpressionLiteral) ->
+    case Expression of
+        Expected ->
+          ok;
+        Value ->
+            erlang:error({assertEqual_failed,
+                [
+                    {line, Line},
+                    {expression, ExpressionLiteral},
+                    {expected, Expected},
+                    {got, Value}
+                ]})
+    end.
 
-
+assert_match(Guard, Expression, Line, ExpressionLiteral) ->
+    case Expression of
+        Guard ->
+          ok;
+        Value ->
+            erlang:error({assertMatch_failed,
+                [
+                    {line, Line},
+                    {expression, ExpressionLiteral},
+                    {expected, Guard},
+                    {got, Value}
+                ]})
+    end.
